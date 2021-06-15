@@ -7,6 +7,7 @@
 #include <sys/ioctl.h>
 #include <arpa/inet.h>
 #include <string.h>
+#include <sys/time.h>
 #include <unistd.h>
 
 std::map<std::string, int> Socket::sockets;
@@ -17,7 +18,7 @@ int Socket::open_socket(const std::string &ip) {
         exit(EXIT_FAILURE);
     }
 
-    timeval tout;
+    struct timeval tout;
     tout.tv_sec = 0;
     tout.tv_usec = 1000;
     setsockopt(sockets[ip], SOL_SOCKET, SO_RCVTIMEO, &tout, sizeof(tout));

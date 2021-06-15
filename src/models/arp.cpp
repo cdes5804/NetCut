@@ -10,7 +10,6 @@
 #include <atomic>
 
 #include <string.h>
-#include <net/ethernet.h>
 #include <linux/if_packet.h>
 #include <linux/if_arp.h>
 #include <arpa/inet.h>
