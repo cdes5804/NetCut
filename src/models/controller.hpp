@@ -13,7 +13,7 @@ class Controller {
   private:
     NetworkScanner scanner;
     std::set<Host> hosts;
-    std::map<Host, std::map<Host, ARP>> arp;
+    std::map<Host, ARP> arp;
     void scan_targets();
     void attack(const Host &target);
     void recover(const Host &target);

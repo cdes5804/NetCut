@@ -86,8 +86,12 @@ void Controller::attack(const Host &target) {
         if (host.get_ip() == target.get_ip() || !interface.is_same_subnet(host.get_ip())) {
             continue;
         }
-        arp[target][host] = ARP(interface);
-        arp[target][host].spoof(target, host);
+
+        if (arp.find(host) == arp.end()) {
+            arp[host] = ARP(interface);
+        }
+        
+        arp[host].spoof(target, host);
     }
     target.set_status(Status::CUT);
 }
@@ -98,7 +102,7 @@ void Controller::recover(const Host &target) {
         if (host.get_ip() == target.get_ip() || !interface.is_same_subnet(host.get_ip())) {
             continue;
         }
-        arp[target][host].recover(target, host);
+        arp[host].recover(target, host);
     }
     target.set_status(Status::NORMAL);
 }
