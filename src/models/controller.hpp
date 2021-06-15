@@ -14,11 +14,13 @@ class Controller {
     NetworkScanner scanner;
     std::set<Host> hosts;
     std::map<Host, ARP> arp;
+    std::map<Host, std::string> fake_mac_address;
     int attack_interval_ms;
     void scan_targets();
     void attack(const Host &target);
     void recover(const Host &target);
     void recover_all_hosts();
+    std::string get_fake_mac_address() const;
 
   public:
     Controller(const int attack_interval_ms);

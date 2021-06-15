@@ -5,6 +5,7 @@
 Host::Host(const string &ip_address, const string &mac_address) {
     this->ip_address = ip_address;
     this->mac_address = mac_address;
+    status = Status::NORMAL;
 }
 
 bool Host::operator<(const Host &other) const {

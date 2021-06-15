@@ -1,6 +1,7 @@
 #include "models/controller.hpp"
 #include "utils/socket_utils.hpp"
 #include "utils/thread_utils.hpp"
+#include "utils/mac_utils.hpp"
 #include "utils/color.hpp"
 #include "utils/string_utils.hpp"
 
@@ -89,11 +90,15 @@ void Controller::attack(const Host &target) {
             continue;
         }
 
-        if (arp.find(host) == arp.end()) {
-            arp[host] = ARP(interface);
+        if (arp.find(target) == arp.end()) {
+            arp[target] = ARP(interface);
         }
 
-        arp[host].spoof(target, host, attack_interval_ms);
+        if (fake_mac_address.find(host) == fake_mac_address.end()) {
+            fake_mac_address[host] = get_fake_mac_address();
+        }
+
+        arp[target].spoof(target, host, attack_interval_ms, fake_mac_address[host]);
     }
     target.set_status(Status::CUT);
 }
@@ -104,7 +109,7 @@ void Controller::recover(const Host &target) {
         if (host.get_ip() == target.get_ip() || !interface.is_same_subnet(host.get_ip())) {
             continue;
         }
-        arp[host].recover(target, host);
+        arp[target].recover(target, host);
     }
     target.set_status(Status::NORMAL);
 }
@@ -115,4 +120,8 @@ void Controller::recover_all_hosts() {
             recover(host);
         }
     }
+}
+
+std::string Controller::get_fake_mac_address() const {
+    return Mac::get_random_mac_address();
 }
