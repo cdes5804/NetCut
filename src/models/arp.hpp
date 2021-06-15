@@ -38,18 +38,18 @@ class ARP {
     int sd;
     Interface interface;
     struct sockaddr_ll prepare_arp(unsigned char *buffer, const uint32_t &dst_ip, Operation op=Operation::REQUEST,
-                                    const std::string &dst_mac="", const uint32_t &src_ip=0, const std::string &src_mac="");
-    void _listen(std::map<std::string, std::string> &arp_table);
-    void _spoof(const Host &target, const std::string &spoof_src_ip, const int sd, const int attack_interval_ms);
+                                    const std::string &dst_mac="", const uint32_t &src_ip=0, const std::string &src_mac="") const;
+    void _listen(std::map<std::string, std::string> &arp_table) const;
+    void _spoof(const Host &target, const std::string &spoof_src_ip, const int sd, const int attack_interval_ms) const;
 
   public:
     ARP(const Interface &_interface);
     ARP();
     ~ARP();
-    void request(const std::string &target_ip);
-    void listen(std::map<std::string, std::string> &arp_table);
-    void spoof(const Host &target, const Host &spoof_src, const int attack_interval_ms=DEFAULT_ATTACK_INTERVAL_MILLISECONDS);
-    void recover(const Host &target, const Host &spoof_src);
+    void request(const std::string &target_ip) const;
+    void listen(std::map<std::string, std::string> &arp_table) const;
+    void spoof(const Host &target, const Host &spoof_src, const int attack_interval_ms=DEFAULT_ATTACK_INTERVAL_MILLISECONDS) const;
+    void recover(const Host &target, const Host &spoof_src) const;
 };
 
 #endif

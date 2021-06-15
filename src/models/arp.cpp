@@ -31,7 +31,7 @@ ARP::~ARP() {
     }
 }
 
-struct sockaddr_ll ARP::prepare_arp(unsigned char *buffer, const uint32_t &dst_ip, Operation op, const std::string &dst_mac, const uint32_t &src_ip, const std::string &src_mac) {
+struct sockaddr_ll ARP::prepare_arp(unsigned char *buffer, const uint32_t &dst_ip, Operation op, const std::string &dst_mac, const uint32_t &src_ip, const std::string &src_mac) const {
     memset(buffer, 0, BUF_SIZE);
     unsigned char mac_address[MAC_LENGTH];
 
@@ -86,7 +86,7 @@ struct sockaddr_ll ARP::prepare_arp(unsigned char *buffer, const uint32_t &dst_i
     return socket_address;
 }
 
-void ARP::_listen(std::map<std::string, std::string> &arp_table) {
+void ARP::_listen(std::map<std::string, std::string> &arp_table) const {
     unsigned char buffer[BUF_SIZE];
     while (Thread::listen_signal[interface.get_ip()].load(std::memory_order_relaxed)) {
         ssize_t recv_len = recvfrom(sd, buffer, BUF_SIZE, 0, NULL, NULL);
@@ -131,12 +131,12 @@ void ARP::_listen(std::map<std::string, std::string> &arp_table) {
     }
 }
 
-void ARP::listen(std::map<std::string, std::string> &arp_table) {
+void ARP::listen(std::map<std::string, std::string> &arp_table) const {
     Thread::listen_signal[interface.get_ip()].store(true, std::memory_order_relaxed);
     Thread::listening_thread[interface.get_ip()] = std::thread(&ARP::_listen, this, std::ref(arp_table));
 }
 
-void ARP::_spoof(const Host &target, const std::string &spoof_src_ip, const int sd, const int attack_interval_ms) {
+void ARP::_spoof(const Host &target, const std::string &spoof_src_ip, const int sd, const int attack_interval_ms) const {
     unsigned char buffer[BUF_SIZE];
     std::string target_ip = target.get_ip();
     uint32_t src_ip = inet_addr(spoof_src_ip.c_str());
@@ -161,7 +161,7 @@ void ARP::_spoof(const Host &target, const std::string &spoof_src_ip, const int 
     }
 }
 
-void ARP::request(const std::string &target_ip) {
+void ARP::request(const std::string &target_ip) const {
     unsigned char buffer[BUF_SIZE];
     uint32_t dst_ip = inet_addr(target_ip.c_str());
     struct sockaddr_ll socket_address = prepare_arp(buffer, dst_ip);
@@ -170,13 +170,13 @@ void ARP::request(const std::string &target_ip) {
     }
 }
 
-void ARP::spoof(const Host &target, const Host &spoof_src, const int attack_interval_ms) {
+void ARP::spoof(const Host &target, const Host &spoof_src, const int attack_interval_ms) const {
     std::string spoof_src_ip = spoof_src.get_ip();
     Thread::spoof_signal[target.get_ip()][spoof_src_ip].store(true, std::memory_order_relaxed);
     Thread::spoof_thread[target.get_ip()][spoof_src_ip] = std::thread(&ARP::_spoof, this, target, spoof_src_ip, sd, attack_interval_ms);
 }
 
-void ARP::recover(const Host &target, const Host &spoof_src) {
+void ARP::recover(const Host &target, const Host &spoof_src) const {
     std::string target_ip = target.get_ip();
     std::string spoof_src_ip = spoof_src.get_ip();
     if (Thread::stop_thread(target_ip, spoof_src_ip)) {

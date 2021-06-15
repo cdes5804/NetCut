@@ -10,7 +10,7 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 
-bool NetworkScanner::is_network(const struct ifaddrs *ifaddr) {
+bool NetworkScanner::is_network(const struct ifaddrs *ifaddr) const {
     sa_family_t family = ifaddr->ifa_addr->sa_family;
     unsigned int flags = ifaddr->ifa_flags;
     bool is_up = (flags & IFF_UP) != 0;
@@ -19,7 +19,7 @@ bool NetworkScanner::is_network(const struct ifaddrs *ifaddr) {
     return family == AF_INET && is_up && !is_loopback;
 }
 
-bool NetworkScanner::is_link(const struct ifaddrs *ifaddr) {
+bool NetworkScanner::is_link(const struct ifaddrs *ifaddr) const {
     sa_family_t family = ifaddr->ifa_addr->sa_family;
     unsigned int flags = ifaddr->ifa_flags;
     bool is_up = (flags & IFF_UP) != 0;
@@ -28,7 +28,7 @@ bool NetworkScanner::is_link(const struct ifaddrs *ifaddr) {
     return family == AF_PACKET && is_up && !is_loopback;
 }
 
-std::string NetworkScanner::get_ip(const struct ifaddrs *ifaddr) {
+std::string NetworkScanner::get_ip(const struct ifaddrs *ifaddr) const {
     char buffer[INET_ADDRSTRLEN];
 
     if (getnameinfo(ifaddr->ifa_addr, sizeof(struct sockaddr_in), buffer, INET_ADDRSTRLEN, NULL, 0, NI_NUMERICHOST) != 0) {
@@ -39,7 +39,7 @@ std::string NetworkScanner::get_ip(const struct ifaddrs *ifaddr) {
     return std::string(buffer);
 }
 
-std::string NetworkScanner::get_netmask(const struct ifaddrs *ifaddr) {
+std::string NetworkScanner::get_netmask(const struct ifaddrs *ifaddr) const {
     char buffer[INET_ADDRSTRLEN];
 
     if (getnameinfo(ifaddr->ifa_netmask, sizeof(struct sockaddr_in), buffer, INET_ADDRSTRLEN, NULL, 0, NI_NUMERICHOST) != 0) {
@@ -50,7 +50,7 @@ std::string NetworkScanner::get_netmask(const struct ifaddrs *ifaddr) {
     return std::string(buffer);
 }
 
-std::string NetworkScanner::get_interface_name(const struct ifaddrs *ifaddr) {
+std::string NetworkScanner::get_interface_name(const struct ifaddrs *ifaddr) const {
     return std::string(ifaddr->ifa_name);
 }
 
@@ -117,8 +117,8 @@ std::vector<Host> NetworkScanner::scan_networks() {
     return hosts;
 }
 
-Interface NetworkScanner::get_interface_by_ip(const std::string &ip) {
-    for (Interface &interface : interfaces) {
+Interface NetworkScanner::get_interface_by_ip(const std::string &ip) const {
+    for (const Interface &interface : interfaces) {
         if (interface.is_same_subnet(ip)) {
             return interface;
         }
