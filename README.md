@@ -6,7 +6,7 @@ A simple tool to ban people's Internet connection with ARP spoofing.
 
 **Note**:
 
-1. This tool is developed and tested on Linux platforms (Ubuntu 20.04 and Arch Linux), currently it has no support for macOS and Windows.
+1. This tool is developed and tested on Linux platforms (Ubuntu 20.04, Arch Linux and alpine), currently it has no support for macOS and Windows.
 2. This tool does not perform any advanced attack beyond ARP spoofing. So if your target is aware of the attack, he/she may be able to nullify the tool.
 3. This tool is only effective against targets in the same network.
 
