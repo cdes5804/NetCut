@@ -1,0 +1,5 @@
+version: '3.4'
+services:
+  netcut:
+    network_mode: host
+    build: .
