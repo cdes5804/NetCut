@@ -17,7 +17,7 @@ constexpr int ARP_REQUEST = 0x01;
 constexpr int ARP_REPLY = 0x02;
 constexpr int BUF_SIZE = 512;
 
-constexpr int ATTACK_INTERVAL_MILLISECONDS = 15000; // continuous arp spoofing but wait for some amount of time before next attack
+constexpr int DEFAULT_ATTACK_INTERVAL_MILLISECONDS = 10000; // continuous arp spoofing but wait for some amount of time before next attack
 
 struct arp_header {
     unsigned short hardware_type;
@@ -40,7 +40,7 @@ class ARP {
     struct sockaddr_ll prepare_arp(unsigned char *buffer, const uint32_t &dst_ip, Operation op=Operation::REQUEST,
                                     const std::string &dst_mac="", const uint32_t &src_ip=0, const std::string &src_mac="");
     void _listen(std::map<std::string, std::string> &arp_table);
-    void _spoof(const Host &target, const std::string &spoof_src_ip, int sd);
+    void _spoof(const Host &target, const std::string &spoof_src_ip, const int sd, const int attack_interval_ms);
 
   public:
     ARP(const Interface &_interface);
@@ -48,7 +48,7 @@ class ARP {
     ~ARP();
     void request(const std::string &target_ip);
     void listen(std::map<std::string, std::string> &arp_table);
-    void spoof(const Host &target, const Host &spoof_src);
+    void spoof(const Host &target, const Host &spoof_src, const int attack_interval_ms=DEFAULT_ATTACK_INTERVAL_MILLISECONDS);
     void recover(const Host &target, const Host &spoof_src);
 };
 

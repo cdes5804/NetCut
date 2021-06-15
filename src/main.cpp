@@ -1,7 +1,8 @@
 #include "models/controller.hpp"
 
 int main(int argc, char *argv[]) {
-    Controller controller;
+    const int attack_interval_ms = 10000;
+    Controller controller(attack_interval_ms);
 
     while (true) {
         controller.show_targets();

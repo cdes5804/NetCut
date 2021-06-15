@@ -136,7 +136,7 @@ void ARP::listen(std::map<std::string, std::string> &arp_table) {
     Thread::listening_thread[interface.get_ip()] = std::thread(&ARP::_listen, this, std::ref(arp_table));
 }
 
-void ARP::_spoof(const Host &target, const std::string &spoof_src_ip, int sd) {
+void ARP::_spoof(const Host &target, const std::string &spoof_src_ip, const int sd, const int attack_interval_ms) {
     unsigned char buffer[BUF_SIZE];
     std::string target_ip = target.get_ip();
     uint32_t src_ip = inet_addr(spoof_src_ip.c_str());
@@ -149,7 +149,7 @@ void ARP::_spoof(const Host &target, const std::string &spoof_src_ip, int sd) {
     while (Thread::spoof_signal[target_ip][spoof_src_ip].load(std::memory_order_relaxed)) {
         auto current_time = Clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - last_attack_time).count();
-        if (duration < ATTACK_INTERVAL_MILLISECONDS) {
+        if (duration < attack_interval_ms) {
             continue; // wait for some amount of time before the next spoofing packet.
         }
 
@@ -170,10 +170,10 @@ void ARP::request(const std::string &target_ip) {
     }
 }
 
-void ARP::spoof(const Host &target, const Host &spoof_src) {
+void ARP::spoof(const Host &target, const Host &spoof_src, const int attack_interval_ms) {
     std::string spoof_src_ip = spoof_src.get_ip();
     Thread::spoof_signal[target.get_ip()][spoof_src_ip].store(true, std::memory_order_relaxed);
-    Thread::spoof_thread[target.get_ip()][spoof_src_ip] = std::thread(&ARP::_spoof, this, target, spoof_src_ip, sd);
+    Thread::spoof_thread[target.get_ip()][spoof_src_ip] = std::thread(&ARP::_spoof, this, target, spoof_src_ip, sd, attack_interval_ms);
 }
 
 void ARP::recover(const Host &target, const Host &spoof_src) {

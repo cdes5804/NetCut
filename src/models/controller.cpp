@@ -8,6 +8,8 @@
 #include <string>
 #include <algorithm>
 
+Controller::Controller(const int attack_interval_ms) : attack_interval_ms(attack_interval_ms) {}
+
 void Controller::scan_targets() {
     std::vector<Host> active_hosts = scanner.scan_networks();
     for (const Host &active_host : active_hosts) {
@@ -90,8 +92,8 @@ void Controller::attack(const Host &target) {
         if (arp.find(host) == arp.end()) {
             arp[host] = ARP(interface);
         }
-        
-        arp[host].spoof(target, host);
+
+        arp[host].spoof(target, host, attack_interval_ms);
     }
     target.set_status(Status::CUT);
 }
