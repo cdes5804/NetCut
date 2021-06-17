@@ -1,5 +1,5 @@
 INCLUDE_PATH = src/
-CPP_FLAGS = -Wall -Wextra -O2 -std=c++17
+CPP_FLAGS = -Wall -Wextra -O3 -std=c++17
 PTHREAD = -pthread
 PISTACHE_CFLAGS = $(shell pkg-config --cflags libpistache)
 PISTACHE_LDFLAGS = $(shell pkg-config --libs libpistache)
