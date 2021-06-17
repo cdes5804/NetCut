@@ -3,15 +3,10 @@
 #include <net/if.h>
 #include <arpa/inet.h>
 
-Interface::Interface(const std::string &name, const std::string &ip, const std::string &netmask) {
-    this->name = name;
-    this->ip = ip;
-    this->netmask = netmask;
-}
+Interface::Interface(const std::string &name, const std::string &ip, const std::string &netmask) :
+    name(name), ip(ip), netmask(netmask) {}
 
-Interface::Interface() {
-    // empty Interface, interface equivalence of null
-}
+Interface::Interface() { } // empty Interface, interface equivalence of null
 
 std::string Interface::get_name() const {
     return name;
