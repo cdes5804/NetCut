@@ -43,7 +43,7 @@ std::string NetworkScanner::get_netmask(const struct ifaddrs *ifaddr) const {
     char buffer[INET_ADDRSTRLEN];
 
     if (getnameinfo(ifaddr->ifa_netmask, sizeof(struct sockaddr_in), buffer, INET_ADDRSTRLEN, NULL, 0, NI_NUMERICHOST) != 0) {
-        std::cerr << "get_ip: Unable to get interface IP.\n";
+        std::cerr << "get_ip: Unable to get interface netmask.\n";
         exit(EXIT_FAILURE);
     }
 
@@ -76,7 +76,7 @@ void NetworkScanner::scan_subnet(const Interface &interface) {
         char buffer[INET_ADDRSTRLEN];
         inet_ntop(AF_INET, &target_ip_struct, buffer, INET_ADDRSTRLEN);
 
-        string target_ip = string(buffer);
+        std::string target_ip = std::string(buffer);
 
         if (target_ip == interface.get_ip()) {
             continue;
@@ -98,9 +98,9 @@ std::vector<Host> NetworkScanner::scan_networks() {
 
     for (struct ifaddrs *ifaddr = ifaddrs; ifaddr != NULL; ifaddr = ifaddr->ifa_next) {
         if (is_network(ifaddr)) {
-            string ip = get_ip(ifaddr);
-            string netmask = get_netmask(ifaddr);
-            string interface_name = get_interface_name(ifaddr);
+            std::string ip = get_ip(ifaddr);
+            std::string netmask = get_netmask(ifaddr);
+            std::string interface_name = get_interface_name(ifaddr);
 
             interfaces.emplace_back(interface_name, ip, netmask);
             scan_subnet(interfaces.back());

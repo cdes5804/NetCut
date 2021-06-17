@@ -3,24 +3,25 @@
 
 #include <string>
 
-using std::string;
-
-enum class Status { NORMAL, CUT };
+enum class Status { NORMAL, CUT, NOT_EXIST };
 
 class Host {
   private:
-    string ip_address;
-    mutable string mac_address;
+    std::string ip_address;
+    mutable std::string mac_address;
     mutable Status status;
     
   public:
-    Host(const string &ip_address, const string &mac_address);
+    Host(); // empty host, null equivalent
+    Host(const std::string &ip_address); // for temp host
+    Host(const std::string &ip_address, const std::string &mac_address);
     bool operator<(const Host &other) const;
-    string get_ip() const;
-    string get_mac() const;
+    std::string get_ip() const;
+    std::string get_mac() const;
+    Status get_status() const;
     bool is_cut() const;
     void set_status(Status status) const;
-    void set_mac_address(const string &mac_address) const;
+    void set_mac_address(const std::string &mac_address) const;
 };
 
 #endif

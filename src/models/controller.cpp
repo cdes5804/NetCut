@@ -2,84 +2,59 @@
 #include "utils/socket_utils.hpp"
 #include "utils/thread_utils.hpp"
 #include "utils/mac_utils.hpp"
-#include "utils/color.hpp"
 #include "utils/string_utils.hpp"
 
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <chrono>
+#include <vector>
 
-Controller::Controller(const int attack_interval_ms) : attack_interval_ms(attack_interval_ms) {}
+typedef std::chrono::high_resolution_clock Clock;
+
+Controller::Controller(const uint32_t attack_interval_ms, const uint32_t scan_interval_ms) 
+            : attack_interval_ms(attack_interval_ms), scan_interval_ms(scan_interval_ms) {}
 
 void Controller::scan_targets() {
+    auto current_time = Clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - last_scan_time).count();
+    if (duration < scan_interval_ms) { // don't scan the network too often
+        return;
+    }
+
     std::vector<Host> active_hosts = scanner.scan_networks();
     for (const Host &active_host : active_hosts) {
         hosts.insert(active_host);
     }
+    last_scan_time = Clock::now();
 }
 
-void Controller::show_targets() {
-    scan_targets();
+std::vector<Host> Controller::get_targets() const {
+    return std::vector<Host>(hosts.begin(), hosts.end());
+}
 
-    Color::Modifier red(Color::Code::FG_RED);
-    Color::Modifier green(Color::Code::FG_GREEN);
-    Color::Modifier normal(Color::Code::FG_DEFAULT);
-
-    std::cout << "\n========================= Net Cut =========================\n";
-    std::cout << "Select one or more targets by number, separated by space.\n";
-    std::cout << "Or enter 'q' to quit, 'r' to refresh targets.\n";
-    std::cout << green << "green: available targets, select to cut.\n";
-    std::cout << red << "red: already cut targets, select to recover.\n" << normal << "\n";
-
-    size_t counter = 1;
+Host Controller::get_host(const std::string &target_ip) const {
     for (const Host &host : hosts) {
-        std::cout << (host.is_cut() ? red : green) << (counter++) << ") " << host.get_ip() << " (" << host.get_mac() << ")\n" << normal;
-    }
-
-    std::cout << "\nTargets: ";
-}
-
-std::vector<size_t> Controller::get_targets() {
-    std::vector<size_t> indices;
-    std::string input;
-    std::getline(std::cin, input);
-    std::string trimmed_input = String::trim(input);
-
-    if (trimmed_input == "q") {
-        recover_all_hosts(); // being nice by recovering the network for targets before exiting
-        Socket::close_sockets();
-        Thread::stop_all_threads();
-        exit(EXIT_SUCCESS);
-    } else if (trimmed_input == "r") {
-        return std::vector<size_t>();
-    }
-    
-    std::vector<std::string> tokens = String::split(trimmed_input, " ");
-
-    std::for_each(tokens.begin(), tokens.end(), [&](const string &s) {
-        if (!s.empty() && std::all_of(s.begin(), s.end(), [](const char &chr) { return isdigit(chr); })) {
-            indices.emplace_back(std::stoul(s));
+        if (host.get_ip() == target_ip) {
+            return host;
         }
-    });
-
-    std::sort(indices.begin(), indices.end());
-
-    return indices;
-}
-
-void Controller::action(size_t index) {
-    index--;
-    if (index >= hosts.size()) {
-        return;
     }
 
-    auto iter = hosts.begin();
-    std::advance(iter, index);
+    return Host();
+}
+
+ACTION_STATUS Controller::action(const std::string &target_ip) {
+    auto iter = hosts.find(Host(target_ip));
+    if (iter == hosts.end()) {
+        return ACTION_STATUS::TARGET_NOT_FOUND;
+    }
 
     if (iter->is_cut()) {
         recover(*iter);
+        return ACTION_STATUS::RECOVER_SUCCESS;
     } else {
         attack(*iter);
+        return ACTION_STATUS::CUT_SUCCESS;
     }
 }
 
