@@ -43,7 +43,7 @@ Currently the application has the following APIs:
       * `Recovered`: The target was cut before, and now its Internet connection is restored.
    * `Target`: Repeat the specified IP address.
 
-* `Post /quit`: Restore the Internet connections of every target that was attack, clean up the resources, and exit.
+* `Post /quit`: Restore the Internet connections of every target that was attack, clean up the resources, and exit. Before exiting, the application sends a string **OK** as response.
 
 ## Other versions
 
