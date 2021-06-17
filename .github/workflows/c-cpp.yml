@@ -14,4 +14,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: docker compose
-      run: docker-compose run --rm netcut
+      run: docker-compose run --rm -d netcut
