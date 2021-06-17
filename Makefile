@@ -4,7 +4,9 @@ PTHREAD = -pthread
 PISTACHE_CFLAGS = $(shell pkg-config --cflags libpistache)
 PISTACHE_LDFLAGS = $(shell pkg-config --libs libpistache)
 
-M_OBJS = bin/models/scanner.o bin/models/arp.o bin/models/host.o bin/models/interface.o bin/models/controller.o bin/utils/string_utils.o bin/utils/thread_utils.o bin/utils/socket_utils.o bin/utils/mac_utils.o bin/routes/api.o
+M_OBJS = bin/models/scanner.o bin/models/arp.o bin/models/host.o bin/models/interface.o \
+		bin/models/controller.o bin/utils/string_utils.o bin/utils/thread_utils.o \
+		bin/utils/socket_utils.o bin/utils/mac_utils.o bin/routes/api.o
 
 all: bin/main
 
