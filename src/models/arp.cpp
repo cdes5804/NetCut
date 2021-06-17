@@ -124,15 +124,14 @@ void ARP::listen(std::map<std::string, std::string> &arp_table) const {
     Thread::listening_thread[interface.get_ip()] = std::thread(&ARP::_listen, this, std::ref(arp_table));
 }
 
-void ARP::_spoof(const Host &target, const std::string &spoof_src_ip, const int sd, const int attack_interval_ms, const std::string &fake_mac_address) const {
+void ARP::_spoof(const Host &target, const std::string &spoof_src_ip, const int sd, const uint32_t attack_interval_ms, const std::string &fake_mac_address) const {
     unsigned char buffer[BUF_SIZE];
     std::string target_ip = target.get_ip();
     uint32_t src_ip = inet_addr(spoof_src_ip.c_str());
     uint32_t dst_ip = inet_addr(target_ip.c_str());
     struct sockaddr_ll socket_address = prepare_arp(buffer, dst_ip, Operation::SPOOF, target.get_mac(), src_ip, fake_mac_address);
 
-    auto last_attack_time = Clock::now(); // let auto determine the type
-    last_attack_time = {}; // then clear the time_point
+    Clock::time_point last_attack_time = {}; // set time_point to zero
 
     while (Thread::spoof_signal[target_ip][spoof_src_ip].load(std::memory_order_relaxed)) {
         auto current_time = Clock::now();
@@ -159,7 +158,7 @@ void ARP::request(const std::string &target_ip) const {
     }
 }
 
-void ARP::spoof(const Host &target, const Host &spoof_src, const int attack_interval_ms, const std::string &fake_mac_address) const {
+void ARP::spoof(const Host &target, const Host &spoof_src, const uint32_t attack_interval_ms, const std::string &fake_mac_address) const {
     std::string spoof_src_ip = spoof_src.get_ip();
     Thread::spoof_signal[target.get_ip()][spoof_src_ip].store(true, std::memory_order_relaxed);
     Thread::spoof_thread[target.get_ip()][spoof_src_ip] = std::thread(&ARP::_spoof, this, target, spoof_src_ip, sd, attack_interval_ms, fake_mac_address);
