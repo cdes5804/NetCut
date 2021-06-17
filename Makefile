@@ -4,7 +4,7 @@ PTHREAD = -pthread
 PISTACHE_CFLAGS = $(shell pkg-config --cflags libpistache)
 PISTACHE_LDFLAGS = $(shell pkg-config --libs libpistache)
 
-M_OBJS = bin/models/scanner.o bin/models/arp.o bin/models/host.o bin/models/interface.o bin/models/controller.o bin/utils/string_utils.o bin/utils/thread_utils.o bin/utils/socket_utils.o bin/utils/mac_utils.o bin/routes/api.o bin/routes/ping.o bin/routes/quit.o
+M_OBJS = bin/models/scanner.o bin/models/arp.o bin/models/host.o bin/models/interface.o bin/models/controller.o bin/utils/string_utils.o bin/utils/thread_utils.o bin/utils/socket_utils.o bin/utils/mac_utils.o bin/routes/api.o
 
 all: bin/main
 
@@ -51,13 +51,5 @@ bin/utils/mac_utils.o: src/utils/mac_utils.cpp
 	g++ $^ -c -o $@ $(CPP_FLAGS) -I $(INCLUDE_PATH)
 
 bin/routes/api.o: src/routes/api.cpp
-	mkdir -p bin/routes/
-	g++ $^ -c -o $@ $(CPP_FLAGS) $(PISTACHE_CFLAGS) -I $(INCLUDE_PATH)
-
-bin/routes/ping.o: src/routes/ping.cpp
-	mkdir -p bin/routes/
-	g++ $^ -c -o $@ $(CPP_FLAGS) $(PISTACHE_CFLAGS) -I $(INCLUDE_PATH)
-
-bin/routes/quit.o: src/routes/quit.cpp
 	mkdir -p bin/routes/
 	g++ $^ -c -o $@ $(CPP_FLAGS) $(PISTACHE_CFLAGS) -I $(INCLUDE_PATH)
