@@ -47,5 +47,5 @@ Currently the application has the following APIs:
 
 ## Other versions
 
-If you prefer to use the CLI version, you can build it from [here](https://github.com/cdes5804/NetCut/tree/cli). Note that the version is not tested on many different platforms and may have portibility issue. C++17 is required to build the version.
+If you prefer to use the CLI version, you can build it from [here](https://github.com/cdes5804/NetCut/tree/cli). Note that the version is **not** tested on many different platforms and may have portability issue. C++17 is required to build the version.
 
