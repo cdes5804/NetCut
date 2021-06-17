@@ -82,7 +82,7 @@ void ApiEndpoint::get_targets(const Rest::Request& request, Http::ResponseWriter
         v.push_back({
             { "IP Address", host.get_ip() },
             { "MAC Address", host.get_mac() },
-            { "Status", host.is_cut() ? "CUT" : "NORMAL" },
+            { "Status", host.is_cut() ? "Cut" : "Normal" },
         });
     }
 
