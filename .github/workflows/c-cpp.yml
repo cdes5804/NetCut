@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: Docker CI
 
 on:
   push:
@@ -13,5 +13,5 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: make
-      run: make
+    - name: docker compose
+      run: docker-compose run --rm -d netcut
