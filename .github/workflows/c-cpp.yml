@@ -13,5 +13,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: docker compose
+    - name: Docker compose
       run: docker-compose run --rm -d netcut
+
+    - name: Install node
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+    
+    - name: Install newman
+      run: |
+        npm install -g newman
+
+    - name: Run POSTMAN collection
+      run: |
+        newman run ./test/newman-collection.json

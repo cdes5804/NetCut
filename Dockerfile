@@ -14,3 +14,4 @@ WORKDIR /NetCut
 RUN make
 
 ENTRYPOINT [ "/NetCut/bin/main" ]
+CMD [ "--port", "9090" ]
