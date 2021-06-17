@@ -11,7 +11,8 @@ bool check_cmd_option_exists(char **begin, char **end, const std::string &option
     return std::find(begin, end, option) != end;
 }
 
-std::string get_cmd_option(char **begin, char **end, const std::string &option) {char **itr = std::find(begin, end, option);
+std::string get_cmd_option(char **begin, char **end, const std::string &option) {
+    char **itr = std::find(begin, end, option);
     if (itr != end && ++itr != end) {
         return std::string(*itr);
     }
@@ -19,7 +20,7 @@ std::string get_cmd_option(char **begin, char **end, const std::string &option) 
     return "";
 }
 
-uint32_t parse_cmd_option(int argc, char *argv[], const std::string &option, uint32_t default_value) {
+uint32_t parse_cmd_option(int argc, char *argv[], const std::string &option, const uint32_t default_value) {
     if (check_cmd_option_exists(argv, argv + argc, option)) {
         std::string value = get_cmd_option(argv, argv + argc, option);
         if (value.empty()) {
@@ -45,7 +46,6 @@ std::map<std::string, uint32_t> parse_arguments(int argc, char *argv[]) {
 
     std::map<std::string, uint32_t> args;
 
-    // parse port argument
     args["port"] = parse_cmd_option(argc, argv, "--port", DEFAULT_PORT);
     args["attack_interval"] = parse_cmd_option(argc, argv, "--attack_interval", DEFAULT_ATTACK_INTERVAL_MS);
     args["scan_interval"] = parse_cmd_option(argc, argv, "--scan_interval", DEFAULT_SCAN_INTERVAL_MS);
