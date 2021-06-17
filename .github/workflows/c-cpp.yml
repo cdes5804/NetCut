@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: Docker CI
 
 on:
   push:
@@ -13,5 +13,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: make
-      run: make
+    - name: Docker compose
+      run: docker-compose run --rm -d netcut
+
+    - name: Install node
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+    
+    - name: Install newman
+      run: |
+        npm install -g newman
+
+    - name: Run POSTMAN collection
+      run: |
+        newman run ./test/newman-collection.json
