@@ -29,4 +29,4 @@ jobs:
 
     - name: Run POSTMAN collection
       run: |
-        newman run ./test/newman-collection.json --env-var "port=${{ env.PORT }}"
+        newman run ./test/newman_collection.json --env-var "port=${{ env.PORT }}"
