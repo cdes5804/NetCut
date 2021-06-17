@@ -8,9 +8,9 @@ WORKDIR /pistache
 RUN meson setup build && meson install -C build
 
 # setup netcut
-WORKDIR /
-RUN git clone https://github.com/cdes5804/NetCut.git
+RUN mkdir -p /NetCut
 WORKDIR /NetCut
+COPY . .
 RUN make
 
 ENTRYPOINT [ "/NetCut/bin/main" ]
