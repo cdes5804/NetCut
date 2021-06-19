@@ -93,12 +93,13 @@ void ApiEndpoint::get_targets(const Rest::Request& request, Http::ResponseWriter
     }
 
     json j_vec(v);
-
     response.send(Http::Code::Ok, j_vec.dump());
 }
 
 void ApiEndpoint::action(const Rest::Request& request, Http::ResponseWriter response) {
     response.headers().add<Http::Header::AccessControlAllowOrigin>("*");
+    response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
+
     std::string target_ip = request.param(":ip").as<std::string>();
 
     ACTION_STATUS status = controller.action(target_ip);
@@ -121,8 +122,6 @@ void ApiEndpoint::action(const Rest::Request& request, Http::ResponseWriter resp
     }
 
     json j_map(res);
-
-    response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
     response.send(http_return_code, j_map.dump());
 }
 
@@ -153,6 +152,5 @@ void ApiEndpoint::get_status(const Rest::Request& request, Http::ResponseWriter 
     }
 
     json j_map(res);
-
     response.send(http_return_code, j_map.dump());
 }
