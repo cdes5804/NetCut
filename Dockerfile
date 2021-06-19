@@ -13,5 +13,5 @@ WORKDIR /NetCut
 COPY . .
 RUN make
 
-ENTRYPOINT [ "/NetCut/bin/main" ]
+ENTRYPOINT [ "/NetCut/bin/netcut" ]
 CMD [ "--port", "9090" ]
