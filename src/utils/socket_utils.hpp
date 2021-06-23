@@ -5,11 +5,23 @@
 #include <string>
 
 namespace Socket {
-    extern std::map<std::string, int> sockets;
-    int open_socket(const std::string &ip); // opens a socket associated with the ip
-    void bind_socket(int sd, const std::string &interface_name); // binds socket to the provided interface
-    int get_interface_index(int sd, const std::string &interface_name);
-    void close_sockets();
+    const unsigned int DEFAULT_RECEIVE_TIMEOUT_MICROSEC = 1000;
+
+    // Opens a available socket file descriptor.
+    int open_socket();
+
+    // Set the receive timeout in microsecond for the given socket,
+    // so it will not block when there is nothing to receive.
+    void set_socket_recv_timeout(const int sd, const unsigned int microsecond);
+
+    // Bind the socket to a specific interface.
+    void bind_socket(const int sd, const std::string &interface_name);
+
+    // Get the interface index.
+    int get_interface_index(const int sd, const const std::string &interface_name);
+
+    // Close the given socket.
+    void close_socket(const int sd);
 }
 
 #endif

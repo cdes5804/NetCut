@@ -31,7 +31,6 @@ std::string Mac::byte_mac_to_string(unsigned char *buffer) {
             ss << ":";
         }
     }
-
     return ss.str();
 }
 

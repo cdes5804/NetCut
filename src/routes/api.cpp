@@ -9,17 +9,15 @@
 
 #include <algorithm>
 #include <map>
-#include <thread>
 #include <vector>
 
 using namespace Pistache;
 using json = nlohmann::json;
 
-void start_server(uint16_t listening_port, const Controller &controller) {
+void start_server(uint16_t listening_port, const Controller &controller, const unsigned int num_threads) {
     Port port(listening_port);
 
-    unsigned int num_threads = std::thread::hardware_concurrency();
-    unsigned int server_num_threads = std::max(1U, num_threads / 4);
+    unsigned int server_num_threads = std::max(1U, num_threads);
 
     Address addr(Ipv4::any(), port);
 

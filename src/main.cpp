@@ -7,12 +7,14 @@
 #include <stdexcept> 
 #include <string>
 
-bool check_cmd_option_exists(char **begin, char **end, const std::string &option) {
-    return std::find(begin, end, option) != end;
+// Check if the given flag is specified by the user.
+bool check_cmd_flag_exists(char **begin, char **end, const std::string &flag) {
+    return std::find(begin, end, flag) != end;
 }
 
-std::string get_cmd_option(char **begin, char **end, const std::string &option) {
-    char **itr = std::find(begin, end, option);
+// Retrieve the value of the given flag from the command line.
+std::string get_cmd_flag(char **begin, char **end, const std::string &flag) {
+    char **itr = std::find(begin, end, flag);
     if (itr != end && ++itr != end) {
         return std::string(*itr);
     }
@@ -20,11 +22,13 @@ std::string get_cmd_option(char **begin, char **end, const std::string &option) 
     return "";
 }
 
-uint32_t parse_cmd_option(int argc, char *argv[], const std::string &option, const uint32_t default_value) {
-    if (check_cmd_option_exists(argv, argv + argc, option)) {
-        std::string value = get_cmd_option(argv, argv + argc, option);
+// Given a flag, try to retrieve its value if it's specified by the user,
+// otherwise return the default value.
+uint32_t parse_cmd_flag(int argc, char *argv[], const std::string &flag, const uint32_t default_value) {
+    if (check_cmd_option_exists(argv, argv + argc, flag)) {
+        std::string value = get_cmd_option(argv, argv + argc, flag);
         if (value.empty()) {
-            std::cerr << "Please specify a port after [" << option << "].\n";
+            std::cerr << "Please specify a port after [" << flag << "].\n";
             exit(EXIT_FAILURE);
         } else {
             try {
@@ -39,6 +43,8 @@ uint32_t parse_cmd_option(int argc, char *argv[], const std::string &option, con
     }
 }
 
+// Parse the command line arguments, and return a std::map with either
+// user-specified value or default value for each flag.
 std::map<std::string, uint32_t> parse_arguments(int argc, char *argv[]) {
     constexpr uint32_t DEFAULT_PORT = 9090;
     constexpr uint32_t DEFAULT_ATTACK_INTERVAL_MS = 10000;
