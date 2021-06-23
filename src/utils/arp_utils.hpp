@@ -81,7 +81,7 @@ namespace Arp {
     // Prepare arp packet for spoofing and recovering.
     struct sockaddr_ll prepare_arp(
         unsigned char *buffer,
-        const std::string dst_ip,
+        const std::string &dst_ip,
         const std::string &dst_mac,
         const std::string &src_ip,
         const std::string &src_mac,
@@ -90,6 +90,9 @@ namespace Arp {
 
     // Given a raw packet, try to parse it as an arp response and return an arp_response object indicating the result.
     arp_response parse_arp_response(unsigned char *buffer);
+
+    // Send a arp request for the mac address of the given ip
+    void request(const std::string &target_ip, const Interface &interface);
 }
 
 #endif

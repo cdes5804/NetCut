@@ -25,8 +25,8 @@ std::string get_cmd_flag(char **begin, char **end, const std::string &flag) {
 // Given a flag, try to retrieve its value if it's specified by the user,
 // otherwise return the default value.
 uint32_t parse_cmd_flag(int argc, char *argv[], const std::string &flag, const uint32_t default_value) {
-    if (check_cmd_option_exists(argv, argv + argc, flag)) {
-        std::string value = get_cmd_option(argv, argv + argc, flag);
+    if (check_cmd_flag_exists(argv, argv + argc, flag)) {
+        std::string value = get_cmd_flag(argv, argv + argc, flag);
         if (value.empty()) {
             std::cerr << "Please specify a port after [" << flag << "].\n";
             exit(EXIT_FAILURE);
@@ -48,20 +48,20 @@ uint32_t parse_cmd_flag(int argc, char *argv[], const std::string &flag, const u
 std::map<std::string, uint32_t> parse_arguments(int argc, char *argv[]) {
     constexpr uint32_t DEFAULT_PORT = 9090;
     constexpr uint32_t DEFAULT_ATTACK_INTERVAL_MS = 10000;
-    constexpr uint32_t DEFAULT_SCAN_INTERVAL_MS = 5000;
+    constexpr uint32_t DEFAULT_IDLE_THRESHOLD = 3;
 
     std::map<std::string, uint32_t> args;
 
-    args["port"] = parse_cmd_option(argc, argv, "--port", DEFAULT_PORT);
-    args["attack_interval"] = parse_cmd_option(argc, argv, "--attack_interval", DEFAULT_ATTACK_INTERVAL_MS);
-    args["scan_interval"] = parse_cmd_option(argc, argv, "--scan_interval", DEFAULT_SCAN_INTERVAL_MS);
+    args["port"] = parse_cmd_flag(argc, argv, "--port", DEFAULT_PORT);
+    args["attack_interval"] = parse_cmd_flag(argc, argv, "--attack_interval", DEFAULT_ATTACK_INTERVAL_MS);
+    args["idle_threshold"] = parse_cmd_flag(argc, argv, "--idle_threshold", DEFAULT_IDLE_THRESHOLD);
 
     return args;
 }
 
 int main(int argc, char *argv[]) {
     std::map<std::string, uint32_t> args = parse_arguments(argc, argv);
-    Controller controller(args["attack_interval"], args["scan_interval"]);
+    Controller controller(args["attack_interval"], args["idle_threshold"]);
 
     start_server(args["port"], controller);
 

@@ -18,7 +18,7 @@ namespace Socket {
     void bind_socket(const int sd, const std::string &interface_name);
 
     // Get the interface index.
-    int get_interface_index(const int sd, const const std::string &interface_name);
+    int get_interface_index(const int sd, const std::string &interface_name);
 
     // Close the given socket.
     void close_socket(const int sd);

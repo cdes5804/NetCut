@@ -5,13 +5,14 @@
 #include <arpa/inet.h>
 #include <net/if.h>
 
-Interface::Interface(const std::string &name, const std::string &ip, const std::string &netmask) :
+Interface::Interface(const std::string &name, const std::string &ip, const std::string &netmask, const std::string &gateway_ip) :
     name(name),
     ip(ip),
     netmask(netmask),
     socket_fd(Socket::open_socket()),
     index(Socket::get_interface_index(socket_fd, name)),
-    mac_address(Mac::get_interface_mac_address(socket_fd, name)) {
+    mac_address(Mac::get_interface_mac_address(socket_fd, name)),
+    gateway_ip(gateway_ip) {
     Socket::bind_socket(socket_fd, name);
 }
 
@@ -43,6 +44,10 @@ int Interface::get_socket_fd() const {
 
 std::string Interface::get_mac_address() const {
     return mac_address;
+}
+
+std::string Interface::get_gateway_ip() const {
+    return gateway_ip;
 }
 
 bool Interface::is_same_subnet(const std::string &ip) const {

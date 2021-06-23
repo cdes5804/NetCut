@@ -1,6 +1,8 @@
 #include "utils/arp_utils.hpp"
 #include "utils/mac_utils.hpp"
 
+#include <iostream>
+
 #include <arpa/inet.h>
 #include <linux/if_packet.h>
 #include <string.h>
@@ -96,7 +98,7 @@ struct sockaddr_ll Arp::prepare_arp(
 
 struct sockaddr_ll Arp::prepare_arp(
     unsigned char *buffer,
-    const std::string dst_ip,
+    const std::string &dst_ip,
     const std::string &dst_mac,
     const std::string &src_ip,
     const std::string &src_mac,
@@ -140,4 +142,13 @@ Arp::arp_response Arp::parse_arp_response(unsigned char *buffer) {
     response.ip_address = sender_ip;
     response.mac_address = sender_mac;
     return response;
+}
+
+void Arp::request(const std::string &target_ip, const Interface &interface) {
+    unsigned char buffer[BUF_SIZE];
+    struct sockaddr_ll socket_address = prepare_arp(buffer, target_ip, interface);
+
+    if (sendto(interface.get_socket_fd(), buffer, 42, 0, (struct sockaddr *)&socket_address, sizeof(socket_address)) == -1) {
+        std::cerr << "request: Failed to send arp request.\n";
+    }
 }

@@ -48,6 +48,6 @@ class ApiEndpoint {
 
 // Create a ApiEndpoint instance, initialize it with the provided arguments, and start the server.
 // We should use this function to start the server instead of creating a ApiEndpoint object dircectly.
-void start_server(uint16_t listening_port, const Controller &controller, const unsigned int num_threads);
+void start_server(uint16_t listening_port, const Controller &controller, const unsigned int num_threads=2);
 
 #endif

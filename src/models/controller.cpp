@@ -9,21 +9,23 @@
 
 typedef std::chrono::high_resolution_clock Clock;
 
-Controller::Controller(const uint32_t attack_interval_ms, const uint32_t scan_interval_ms) 
-            : attack_interval_ms(attack_interval_ms), scan_interval_ms(scan_interval_ms) {}
+Controller::Controller(const uint32_t attack_interval_ms, const uint32_t idle_threshold)
+    : attacker(attack_interval_ms), scanner(idle_threshold) {}
 
 void Controller::scan_targets() {
-    auto current_time = Clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - last_scan_time).count();
-    if (duration < scan_interval_ms) { // don't scan the network too often
-        return;
-    }
-
     std::vector<Host> active_hosts = scanner.scan_networks();
     for (const Host &active_host : active_hosts) {
         hosts.insert(active_host);
     }
-    last_scan_time = Clock::now();
+
+    auto iter = hosts.begin();
+    while (iter != hosts.end()) {
+        if (std::find(active_hosts.begin(), active_hosts.end(), Host(iter->get_ip())) == active_hosts.end()) {
+            iter = hosts.erase(iter);
+        } else {
+            iter = std::next(iter);
+        }
+    }
 }
 
 std::vector<Host> Controller::get_targets() const {
@@ -57,32 +59,15 @@ ACTION_STATUS Controller::action(const std::string &target_ip) {
 
 void Controller::attack(const Host &target) {
     Interface interface = scanner.get_interface_by_ip(target.get_ip());
-    for (const Host &host : hosts) {
-        if (host.get_ip() == target.get_ip() || !interface.is_same_subnet(host.get_ip())) {
-            continue;
-        }
-
-        if (arp.find(target) == arp.end()) {
-            arp[target] = ARP(interface);
-        }
-
-        if (fake_mac_address.find(host) == fake_mac_address.end()) {
-            fake_mac_address[host] = get_fake_mac_address();
-        }
-
-        arp[target].spoof(target, host, attack_interval_ms, fake_mac_address[host]);
-    }
+    Host gateway = get_host(interface.get_gateway_ip());
+    attacker.attack(interface, target, gateway);
     target.set_status(Status::CUT);
 }
 
 void Controller::recover(const Host &target) {
     Interface interface = scanner.get_interface_by_ip(target.get_ip());
-    for (const Host &host : hosts) {
-        if (host.get_ip() == target.get_ip() || !interface.is_same_subnet(host.get_ip())) {
-            continue;
-        }
-        arp[target].recover(target, host);
-    }
+    Host gateway = get_host(interface.get_gateway_ip());
+    attacker.recover(interface, target, gateway);
     target.set_status(Status::NORMAL);
 }
 
@@ -92,8 +77,4 @@ void Controller::recover_all_hosts() {
             recover(host);
         }
     }
-}
-
-std::string Controller::get_fake_mac_address() const {
-    return Mac::get_random_mac_address();
 }
