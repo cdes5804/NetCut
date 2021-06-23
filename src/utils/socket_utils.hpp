@@ -6,9 +6,14 @@
 
 namespace Socket {
     const unsigned int DEFAULT_RECEIVE_TIMEOUT_MICROSEC = 1000;
+    extern std::map<std::string, int> sockets;
 
     // Opens a available socket file descriptor.
     int open_socket();
+
+    // Given an IP address, retrieve the socket associated with it.
+    // Create a new one if it hasn't already existed.
+    int get_socket(const std::string &ip);
 
     // Set the receive timeout in microsecond for the given socket,
     // so it will not block when there is nothing to receive.
@@ -20,8 +25,8 @@ namespace Socket {
     // Get the interface index.
     int get_interface_index(const int sd, const std::string &interface_name);
 
-    // Close the given socket.
-    void close_socket(const int sd);
+    // Close all sockets opened previously.
+    void close_all_sockets();
 }
 
 #endif

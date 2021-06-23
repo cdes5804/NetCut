@@ -13,7 +13,7 @@
 #include <string.h>
 
 NetworkScanner::NetworkScanner(const uint32_t idle_threshold)
-    : scan_count(0), idle_threshold(idle_threshold){
+    : scan_count(0), idle_threshold(idle_threshold) {
     scan_interface();
 }
 
@@ -156,7 +156,7 @@ void NetworkScanner::_listen() {
             Arp::arp_response response = Arp::parse_arp_response(buffer);
             if (response.is_valid) {
                 Thread::listening_mtx.lock();
-                response_count[response.ip_address]++;
+                response_count[response.ip_address] = scan_count;
                 arp_table[response.ip_address] = response.mac_address;
                 Thread::listening_mtx.unlock();
             }
@@ -178,12 +178,11 @@ std::vector<Host> NetworkScanner::scan_networks(const uint32_t waiting_time_ms) 
     Thread::listening_mtx.lock();
     auto iter = arp_table.begin();
     while (iter != arp_table.end()) {
-        if (response_count[iter->first] < idle_threshold) {
+        if (scan_count - response_count[iter->first] > idle_threshold) {
             response_count.erase(iter->first);
             iter = arp_table.erase(iter);
         } else {
             hosts.emplace_back(iter->first, iter->second);
-            response_count[iter->first] = 0;
             iter = std::next(iter);
         }
     }
@@ -195,12 +194,15 @@ std::vector<Host> NetworkScanner::scan_networks(const uint32_t waiting_time_ms) 
 Interface NetworkScanner::get_interface_by_ip(const std::string &ip) const {
     for (const Interface &interface : interfaces) {
         if (interface.is_same_subnet(ip)) {
+            std::cerr << interface.get_socket_fd() << "\n";
             return interface;
         }
     }
+    std::cerr << "not found\n";
     return Interface();
 }
 
 void NetworkScanner::listen() {
+    Thread::listening_signal.store(true);
     Thread::listening_thread = std::thread(&NetworkScanner::_listen, this);
 }

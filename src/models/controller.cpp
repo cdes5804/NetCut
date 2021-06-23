@@ -10,7 +10,9 @@
 typedef std::chrono::high_resolution_clock Clock;
 
 Controller::Controller(const uint32_t attack_interval_ms, const uint32_t idle_threshold)
-    : attacker(attack_interval_ms), scanner(idle_threshold) {}
+    : attacker(attack_interval_ms), scanner(idle_threshold) {
+    scanner.listen();
+}
 
 void Controller::scan_targets() {
     std::vector<Host> active_hosts = scanner.scan_networks();
@@ -59,6 +61,7 @@ ACTION_STATUS Controller::action(const std::string &target_ip) {
 
 void Controller::attack(const Host &target) {
     Interface interface = scanner.get_interface_by_ip(target.get_ip());
+    std::cerr << "controller: " << interface.get_socket_fd() << "\n";
     Host gateway = get_host(interface.get_gateway_ip());
     attacker.attack(interface, target, gateway);
     target.set_status(Status::CUT);

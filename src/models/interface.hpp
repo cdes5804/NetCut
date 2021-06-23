@@ -16,7 +16,6 @@ class Interface {
   public:
     Interface(); // empty Interface, interface equivalence of null
     Interface(const std::string &name, const std::string &ip, const std::string &netmask, const std::string &gateway_ip);
-    ~Interface();
     std::string get_name() const;
     std::string get_ip() const;
     std::string get_netmask() const;

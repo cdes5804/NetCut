@@ -8,20 +8,19 @@
 #include <pistache/http_headers.h>
 
 #include <algorithm>
-#include <map>
 #include <vector>
 
 using namespace Pistache;
 using json = nlohmann::json;
 
-void start_server(uint16_t listening_port, const Controller &controller, const unsigned int num_threads) {
-    Port port(listening_port);
+void start_server(const std::map<std::string, uint32_t> &args) {
+    Port port(args.at("port"));
 
-    unsigned int server_num_threads = std::max(1U, num_threads);
+    unsigned int server_num_threads = std::max(1U, args.at("server_threads"));
 
     Address addr(Ipv4::any(), port);
 
-    ApiEndpoint api(addr, controller);
+    ApiEndpoint api(addr, args.at("attack_interval"), args.at("idle_threshold"));
 
     api.init(server_num_threads);
     api.start();
@@ -36,8 +35,8 @@ void ApiEndpoint::setup_routes() {
     Routes::Post(router, "/quit", Routes::bind(&ApiEndpoint::quit, this));
 }
 
-ApiEndpoint::ApiEndpoint(Address addr, const Controller &controller)
-            : httpEndpoint(std::make_shared<Http::Endpoint>(addr)), controller(controller) {}
+ApiEndpoint::ApiEndpoint(Address addr, const uint32_t attack_interval_ms, const uint32_t idle_threshold)
+            : httpEndpoint(std::make_shared<Http::Endpoint>(addr)), controller(attack_interval_ms, idle_threshold) {}
 
 void ApiEndpoint::init(size_t num_threads) {
     auto opts = Http::Endpoint::options().threads(static_cast<int>(num_threads));
@@ -60,7 +59,6 @@ void ApiEndpoint::quit(const Rest::Request& request, Http::ResponseWriter respon
     response.headers().add<Http::Header::AccessControlAllowOrigin>("*");
 
     controller.recover_all_hosts(); // being nice by recovering the network for targets before exiting
-    Socket::close_sockets();
     Thread::stop_all_threads();
     auto res = response.send(Http::Code::Ok, "OK");
     res.then(

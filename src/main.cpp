@@ -49,21 +49,22 @@ std::map<std::string, uint32_t> parse_arguments(int argc, char *argv[]) {
     constexpr uint32_t DEFAULT_PORT = 9090;
     constexpr uint32_t DEFAULT_ATTACK_INTERVAL_MS = 10000;
     constexpr uint32_t DEFAULT_IDLE_THRESHOLD = 3;
+    constexpr uint32_t DEFAULT_SERVER_THREADS = 2;
 
     std::map<std::string, uint32_t> args;
 
     args["port"] = parse_cmd_flag(argc, argv, "--port", DEFAULT_PORT);
     args["attack_interval"] = parse_cmd_flag(argc, argv, "--attack_interval", DEFAULT_ATTACK_INTERVAL_MS);
     args["idle_threshold"] = parse_cmd_flag(argc, argv, "--idle_threshold", DEFAULT_IDLE_THRESHOLD);
+    args["server_threads"] = parse_cmd_flag(argc, argv, "--server_threads", DEFAULT_SERVER_THREADS);
 
     return args;
 }
 
 int main(int argc, char *argv[]) {
     std::map<std::string, uint32_t> args = parse_arguments(argc, argv);
-    Controller controller(args["attack_interval"], args["idle_threshold"]);
-
-    start_server(args["port"], controller);
+    
+    start_server(args);
 
     return EXIT_SUCCESS;
 }

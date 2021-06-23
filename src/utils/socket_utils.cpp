@@ -10,6 +10,8 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+std::map<std::string, int> Socket::sockets;
+
 int Socket::open_socket() {
     int sd = 0;
     if ((sd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ARP))) <= 0) {
@@ -19,6 +21,14 @@ int Socket::open_socket() {
 
     set_socket_recv_timeout(sd, DEFAULT_RECEIVE_TIMEOUT_MICROSEC);
     return sd;
+}
+
+int Socket::get_socket(const std::string &ip) {
+    if (sockets.find(ip) == sockets.end()) {
+        sockets[ip] = open_socket();
+    }
+
+    return sockets[ip];
 }
 
 void Socket::set_socket_recv_timeout(const int sd, const unsigned int microsecond) {
@@ -62,6 +72,8 @@ int Socket::get_interface_index(const int sd, const std::string &interface_name)
     return ifr.ifr_ifindex;
 }
 
-void Socket::close_socket(const int sd) {
-    close(sd);
+void Socket::close_all_sockets() {
+    for (auto &[ip, sd] : sockets) {
+        close(sd);
+    }
 }

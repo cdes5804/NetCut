@@ -9,7 +9,7 @@ Interface::Interface(const std::string &name, const std::string &ip, const std::
     name(name),
     ip(ip),
     netmask(netmask),
-    socket_fd(Socket::open_socket()),
+    socket_fd(Socket::get_socket(ip)),
     index(Socket::get_interface_index(socket_fd, name)),
     mac_address(Mac::get_interface_mac_address(socket_fd, name)),
     gateway_ip(gateway_ip) {
@@ -17,10 +17,6 @@ Interface::Interface(const std::string &name, const std::string &ip, const std::
 }
 
 Interface::Interface() : socket_fd(0), index(0) {}
-
-Interface::~Interface() {
-    Socket::close_socket(this->socket_fd);
-}
 
 std::string Interface::get_name() const {
     return name;

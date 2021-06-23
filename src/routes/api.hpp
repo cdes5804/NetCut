@@ -8,7 +8,9 @@
 #include <pistache/router.h>
 
 #include <cstdint>
+#include <map>
 #include <memory>
+#include <string>
 
 using namespace Pistache;
 
@@ -22,7 +24,7 @@ class ApiEndpoint {
     void setup_routes();
 
   public:
-    explicit ApiEndpoint(Address addr, const Controller &controller);
+    explicit ApiEndpoint(Address addr, const uint32_t attack_interval_ms, const uint32_t idle_threshold);
     // Initialize the server, setting threads and routes.
     void init(size_t num_threads=2);
 
@@ -48,6 +50,6 @@ class ApiEndpoint {
 
 // Create a ApiEndpoint instance, initialize it with the provided arguments, and start the server.
 // We should use this function to start the server instead of creating a ApiEndpoint object dircectly.
-void start_server(uint16_t listening_port, const Controller &controller, const unsigned int num_threads=2);
+void start_server(const std::map<std::string, uint32_t> &args);
 
 #endif
