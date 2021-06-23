@@ -1,7 +1,7 @@
 #include "models/interface.hpp"
 
-#include <net/if.h>
 #include <arpa/inet.h>
+#include <net/if.h>
 
 Interface::Interface(const std::string &name, const std::string &ip, const std::string &netmask) :
     name(name), ip(ip), netmask(netmask) {}

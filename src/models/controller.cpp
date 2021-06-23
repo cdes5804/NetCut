@@ -1,14 +1,11 @@
 #include "models/controller.hpp"
-#include "utils/socket_utils.hpp"
-#include "utils/thread_utils.hpp"
 #include "utils/mac_utils.hpp"
+#include "utils/socket_utils.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/thread_utils.hpp"
 
-#include <iostream>
-#include <string>
 #include <algorithm>
-#include <chrono>
-#include <vector>
+#include <iostream>
 
 typedef std::chrono::high_resolution_clock Clock;
 

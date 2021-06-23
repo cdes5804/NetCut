@@ -1,18 +1,18 @@
 #include "models/arp.hpp"
-#include "utils/thread_utils.hpp"
-#include "utils/socket_utils.hpp"
 #include "utils/mac_utils.hpp"
+#include "utils/socket_utils.hpp"
+#include "utils/thread_utils.hpp"
 
-#include <iostream>
-#include <chrono>
-#include <thread>
-#include <functional>
 #include <atomic>
+#include <chrono>
+#include <functional>
+#include <iostream>
+#include <thread>
 
-#include <string.h>
-#include <linux/if_packet.h>
-#include <linux/if_arp.h>
 #include <arpa/inet.h>
+#include <linux/if_arp.h>
+#include <linux/if_packet.h>
+#include <string.h>
 
 typedef std::chrono::high_resolution_clock Clock;
 

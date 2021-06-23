@@ -4,9 +4,9 @@
 #include "models/host.hpp"
 #include "models/interface.hpp"
 
-#include <vector>
-#include <string>
 #include <map>
+#include <string>
+#include <vector>
 
 #include <ifaddrs.h>
 

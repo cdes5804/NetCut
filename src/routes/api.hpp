@@ -8,7 +8,6 @@
 #include <pistache/router.h>
 
 #include <cstdint>
-#include <cstddef>
 #include <memory>
 
 using namespace Pistache;

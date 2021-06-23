@@ -1,15 +1,15 @@
 #ifndef _CONTROL_HPP
 #define _CONTROL_HPP
 
-#include "models/host.hpp"
 #include "models/arp.hpp"
+#include "models/host.hpp"
 #include "models/scanner.hpp"
 
-#include <set>
-#include <map>
-#include <vector>
 #include <chrono>
+#include <map>
+#include <set>
 #include <string>
+#include <vector>
 
 enum class ACTION_STATUS { TARGET_NOT_FOUND, CUT_SUCCESS, RECOVER_SUCCESS };
 

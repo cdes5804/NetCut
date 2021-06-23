@@ -1,20 +1,16 @@
-#include "routes/api.hpp"
 #include "models/controller.hpp"
 #include "models/host.hpp"
+#include "routes/api.hpp"
 #include "utils/json.hpp"
 #include "utils/socket_utils.hpp"
 #include "utils/thread_utils.hpp"
 
-#include <pistache/endpoint.h>
-#include <pistache/http.h>
-#include <pistache/router.h>
 #include <pistache/http_headers.h>
 
-#include <thread>
-#include <memory>
 #include <algorithm>
-#include <vector>
 #include <map>
+#include <thread>
+#include <vector>
 
 using namespace Pistache;
 using json = nlohmann::json;

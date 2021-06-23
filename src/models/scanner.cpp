@@ -1,14 +1,13 @@
-#include "models/scanner.hpp"
-#include "models/host.hpp"
 #include "models/arp.hpp"
+#include "models/scanner.hpp"
 
+#include <chrono>
 #include <iostream>
 #include <thread>
-#include <chrono>
 
+#include <arpa/inet.h>
 #include <net/if.h>
 #include <netdb.h>
-#include <arpa/inet.h>
 
 bool NetworkScanner::is_network(const struct ifaddrs *ifaddr) const {
     sa_family_t family = ifaddr->ifa_addr->sa_family;

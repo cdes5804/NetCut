@@ -1,11 +1,11 @@
-#include "routes/api.hpp"
 #include "models/controller.hpp"
+#include "routes/api.hpp"
 
 #include <algorithm>
-#include <string>
-#include <stdexcept> 
 #include <iostream>
 #include <map>
+#include <stdexcept> 
+#include <string>
 
 bool check_cmd_option_exists(char **begin, char **end, const std::string &option) {
     return std::find(begin, end, option) != end;
