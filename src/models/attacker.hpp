@@ -1,6 +1,7 @@
 #ifndef _ATTACKER_HPP
 #define _ATTACKER_HPP
 
+#include "models/host.hpp"
 #include "models/interface.hpp"
 
 #include <map>

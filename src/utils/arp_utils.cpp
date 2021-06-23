@@ -105,7 +105,6 @@ struct sockaddr_ll Arp::prepare_arp(
     const Interface &interface
 ) {
     memset(buffer, 0, BUF_SIZE);
-    unsigned char mac_address[MAC_LENGTH];
     struct sockaddr_ll socket_address;
 
     memset(&socket_address, 0, sizeof(socket_address));

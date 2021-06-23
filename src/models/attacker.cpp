@@ -43,7 +43,7 @@ void Attacker::attack(const Interface &interface, const Host &target, const Host
         fake_mac_address[gateway.get_ip()] = Mac::get_random_mac_address();
     }
 
-    Thread::spoofing_thread[target.get_ip()] = std::thread(Attacker::_attack, this, std::ref(interface), std::ref(target), std::ref(gateway));
+    Thread::spoofing_thread[target.get_ip()] = std::thread(&Attacker::_attack, this, std::ref(interface), std::ref(target), std::ref(gateway));
 }
 
 void Attacker::recover(const Interface &interface, const Host &target, const Host &gateway) {
@@ -57,7 +57,7 @@ void Attacker::recover(const Interface &interface, const Host &target, const Hos
             gateway.get_mac(),
             interface
         );
-        
+
         if (sendto(interface.get_socket_fd(), buffer, 42, 0, (struct sockaddr *)&socket_address, sizeof(socket_address)) == -1) {
             std::cerr << "recover: Failed to send recover packet.\n";
         }

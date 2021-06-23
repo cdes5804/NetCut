@@ -9,9 +9,6 @@
 #include <thread>
 
 #include <arpa/inet.h>
-#include <linux/netlink.h>
-#include <linux/rtnetlink.h>
-#include <net/if.h>
 #include <netdb.h>
 #include <string.h>
 
@@ -116,20 +113,22 @@ void NetworkScanner::scan_interface() {
 }
 
 std::string NetworkScanner::find_gateway(const std::string &interface_name) {
-    constexpr uint32_t BUFFER_SIZE = 4096;
+    constexpr uint16_t BUFFER_SIZE = 4096;
+    constexpr uint8_t INTERFACE_NAME_LEN = 16;
     char buf[BUFFER_SIZE];
-    char iface[IF_NAMESIZE];
+    char iface[INTERFACE_NAME_LEN];
+    struct in_addr addr;
     long unsigned int destination, gateway;
-    in_addr_t *addr;
+    memset(&addr, 0, sizeof(struct in_addr));
     std::ifstream fin("/proc/net/route");
     std::string line;
 
     while (std::getline(fin, line)) {
         if (sscanf(buf, "%s%lx%lx", iface, &destination, &gateway) == 3) {
             if (destination == 0 && std::string(iface) == interface_name) {
-                *addr = gateway;
                 fin.close();
-                return std::string(inet_ntoa(*(struct in_addr *)&addr));
+                addr.s_addr = gateway;
+                return std::string(inet_ntoa(addr));
             }
         }
     }
@@ -203,5 +202,5 @@ Interface NetworkScanner::get_interface_by_ip(const std::string &ip) const {
 }
 
 void NetworkScanner::listen() {
-    Thread::listening_thread = std::thread(NetworkScanner::_listen, this);
+    Thread::listening_thread = std::thread(&NetworkScanner::_listen, this);
 }
