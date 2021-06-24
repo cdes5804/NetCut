@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "794fe945-bb41-4221-bf76-32027e15a39b",
-		"name": "New Collection",
+		"name": "NetCut Tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -17,6 +17,9 @@
 							"});",
 							"pm.test(\"Body matches string\", function () {",
 							"    pm.expect(pm.response.text()).to.equal(\"OK\");",
+							"});",
+							"pm.test(\"Response time is less than 100ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(100);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -40,6 +43,110 @@
 			"response": []
 		},
 		{
+			"name": "Get Targets",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Response time is less than 500ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:{{port}}/get_targets",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"get_targets"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Action",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"pm.test(\"Response time is less than 200ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:{{port}}/action/0.0.0.0",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"action",
+						"0.0.0.0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Status",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"pm.test(\"Response time is less than 500ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:{{port}}/get_status/0.0.0.0",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"get_status",
+						"0.0.0.0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Quit",
 			"event": [
 				{
@@ -51,6 +158,9 @@
 							"});",
 							"pm.test(\"Body matches string\", function () {",
 							"    pm.expect(pm.response.text()).to.equal(\"OK\");",
+							"});",
+							"pm.test(\"Response time is less than 100ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(100);",
 							"});"
 						],
 						"type": "text/javascript"
