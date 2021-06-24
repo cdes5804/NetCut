@@ -5,14 +5,16 @@
 #include <map>
 #include <string>
 #include <thread>
+#include <mutex>
 
 namespace Thread {
-    extern std::map<std::string, std::map<std::string, std::atomic<bool>>> spoof_signal; // attack_signal[target_ip][spoof_src_ip] signal to start attack
-    extern std::map<std::string, std::map<std::string, std::thread>> spoof_thread;
-    extern std::map<std::string, std::atomic<bool>> listen_signal;
-    extern std::map<std::string, std::thread> listening_thread;
-    bool stop_thread(const std::string &target_ip, const std::string &spoof_src_ip);
-    bool stop_thread(const std::string &ip);
+    extern std::map<std::string, std::atomic<bool>> spoofing_signal;
+    extern std::map<std::string, std::thread> spoofing_thread;
+    extern std::mutex listening_mtx;
+    extern std::atomic<bool> listening_signal;
+    extern std::thread listening_thread;
+    bool stop_spoofing_thread(const std::string &target_ip);
+    bool stop_listening_thread();
     void stop_all_threads();
 }
 

@@ -16,7 +16,7 @@ void Mac::string_mac_to_byte(unsigned char *buffer, const std::string &mac_addre
             &int_buffer[0], &int_buffer[1], &int_buffer[2],
             &int_buffer[3], &int_buffer[4], &int_buffer[5]);
     
-    for (int i = 0; i < MAC_LENGTH; i++) {
+    for (int i = 0; i < MAC_LENGTH; ++i) {
         buffer[i] = int_buffer[i];
     }
 }
@@ -25,13 +25,12 @@ std::string Mac::byte_mac_to_string(unsigned char *buffer) {
     std::stringstream ss;
     ss << std::hex;
 
-    for (int i = 0; i < MAC_LENGTH; i++) {
+    for (int i = 0; i < MAC_LENGTH; ++i) {
         ss << std::setw(2) << std::setfill('0') << static_cast<int>(buffer[i]);
         if (i != MAC_LENGTH - 1) {
             ss << ":";
         }
     }
-
     return ss.str();
 }
 

@@ -16,6 +16,10 @@ bool Host::operator<(const Host &other) const {
     return self_ip < other_ip;
 }
 
+bool Host::operator==(const Host &other) const {
+    return ip_address == other.ip_address;
+}
+
 std::string Host::get_ip() const {
     return ip_address;
 }

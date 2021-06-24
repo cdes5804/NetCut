@@ -7,12 +7,14 @@
 #include <stdexcept> 
 #include <string>
 
-bool check_cmd_option_exists(char **begin, char **end, const std::string &option) {
-    return std::find(begin, end, option) != end;
+// Check if the given flag is specified by the user.
+bool check_cmd_flag_exists(char **begin, char **end, const std::string &flag) {
+    return std::find(begin, end, flag) != end;
 }
 
-std::string get_cmd_option(char **begin, char **end, const std::string &option) {
-    char **itr = std::find(begin, end, option);
+// Retrieve the value of the given flag from the command line.
+std::string get_cmd_flag(char **begin, char **end, const std::string &flag) {
+    char **itr = std::find(begin, end, flag);
     if (itr != end && ++itr != end) {
         return std::string(*itr);
     }
@@ -20,11 +22,13 @@ std::string get_cmd_option(char **begin, char **end, const std::string &option) 
     return "";
 }
 
-uint32_t parse_cmd_option(int argc, char *argv[], const std::string &option, const uint32_t default_value) {
-    if (check_cmd_option_exists(argv, argv + argc, option)) {
-        std::string value = get_cmd_option(argv, argv + argc, option);
+// Given a flag, try to retrieve its value if it's specified by the user,
+// otherwise return the default value.
+uint32_t parse_cmd_flag(int argc, char *argv[], const std::string &flag, const uint32_t default_value) {
+    if (check_cmd_flag_exists(argv, argv + argc, flag)) {
+        std::string value = get_cmd_flag(argv, argv + argc, flag);
         if (value.empty()) {
-            std::cerr << "Please specify a port after [" << option << "].\n";
+            std::cerr << "Please specify a port after [" << flag << "].\n";
             exit(EXIT_FAILURE);
         } else {
             try {
@@ -39,25 +43,28 @@ uint32_t parse_cmd_option(int argc, char *argv[], const std::string &option, con
     }
 }
 
+// Parse the command line arguments, and return a std::map with either
+// user-specified value or default value for each flag.
 std::map<std::string, uint32_t> parse_arguments(int argc, char *argv[]) {
     constexpr uint32_t DEFAULT_PORT = 9090;
     constexpr uint32_t DEFAULT_ATTACK_INTERVAL_MS = 10000;
-    constexpr uint32_t DEFAULT_SCAN_INTERVAL_MS = 5000;
+    constexpr uint32_t DEFAULT_IDLE_THRESHOLD = 3;
+    constexpr uint32_t DEFAULT_SERVER_THREADS = 2;
 
     std::map<std::string, uint32_t> args;
 
-    args["port"] = parse_cmd_option(argc, argv, "--port", DEFAULT_PORT);
-    args["attack_interval"] = parse_cmd_option(argc, argv, "--attack_interval", DEFAULT_ATTACK_INTERVAL_MS);
-    args["scan_interval"] = parse_cmd_option(argc, argv, "--scan_interval", DEFAULT_SCAN_INTERVAL_MS);
+    args["port"] = parse_cmd_flag(argc, argv, "--port", DEFAULT_PORT);
+    args["attack_interval"] = parse_cmd_flag(argc, argv, "--attack_interval", DEFAULT_ATTACK_INTERVAL_MS);
+    args["idle_threshold"] = parse_cmd_flag(argc, argv, "--idle_threshold", DEFAULT_IDLE_THRESHOLD);
+    args["server_threads"] = parse_cmd_flag(argc, argv, "--server_threads", DEFAULT_SERVER_THREADS);
 
     return args;
 }
 
 int main(int argc, char *argv[]) {
     std::map<std::string, uint32_t> args = parse_arguments(argc, argv);
-    Controller controller(args["attack_interval"], args["scan_interval"]);
-
-    start_server(args["port"], controller);
+    
+    start_server(args);
 
     return EXIT_SUCCESS;
 }

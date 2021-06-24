@@ -1,13 +1,21 @@
-#include "models/arp.hpp"
 #include "models/scanner.hpp"
+#include "utils/arp_utils.hpp"
+#include "utils/thread_utils.hpp"
 
+#include <algorithm>
 #include <chrono>
+#include <fstream>
 #include <iostream>
 #include <thread>
 
 #include <arpa/inet.h>
-#include <net/if.h>
 #include <netdb.h>
+#include <string.h>
+
+NetworkScanner::NetworkScanner(const uint32_t idle_threshold)
+    : scan_count(0), idle_threshold(idle_threshold) {
+    scan_interface();
+}
 
 bool NetworkScanner::is_network(const struct ifaddrs *ifaddr) const {
     sa_family_t family = ifaddr->ifa_addr->sa_family;
@@ -54,9 +62,6 @@ std::string NetworkScanner::get_interface_name(const struct ifaddrs *ifaddr) con
 }
 
 void NetworkScanner::scan_subnet(const Interface &interface) {
-    ARP arp(interface);
-    arp.listen(arp_table);
-
     struct in_addr ip_address;
     struct in_addr subnet_mask;
 
@@ -66,7 +71,7 @@ void NetworkScanner::scan_subnet(const Interface &interface) {
     uint32_t start_ip = ntohl(ip_address.s_addr & subnet_mask.s_addr);
     uint32_t end_ip = ntohl(ip_address.s_addr | ~(subnet_mask.s_addr));
 
-    for (uint32_t ip_addr = start_ip; ip_addr <= end_ip; ip_addr++) {
+    for (uint32_t ip_addr = start_ip; ip_addr <= end_ip; ++ip_addr) {
         uint32_t network_byte_ip = htonl(ip_addr);
 
         struct in_addr target_ip_struct;
@@ -80,14 +85,12 @@ void NetworkScanner::scan_subnet(const Interface &interface) {
         if (target_ip == interface.get_ip()) {
             continue;
         }
-        
-        arp.request(target_ip);
-    }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(3)); // wait some time for the arp response
+        Arp::request(target_ip, interface);
+    }
 }
 
-std::vector<Host> NetworkScanner::scan_networks() {
+void NetworkScanner::scan_interface() {
     struct ifaddrs *ifaddrs;
 
     if (getifaddrs(&ifaddrs) == -1) {
@@ -100,18 +103,88 @@ std::vector<Host> NetworkScanner::scan_networks() {
             std::string ip = get_ip(ifaddr);
             std::string netmask = get_netmask(ifaddr);
             std::string interface_name = get_interface_name(ifaddr);
+            std::string gateway_ip = find_gateway(interface_name);
 
-            interfaces.emplace_back(interface_name, ip, netmask);
-            scan_subnet(interfaces.back());
+            interfaces.emplace_back(interface_name, ip, netmask, gateway_ip);
         }
     }
 
     freeifaddrs(ifaddrs);
+}
+
+std::string NetworkScanner::find_gateway(const std::string &interface_name) {
+    constexpr uint8_t INTERFACE_NAME_LEN = 16;
+    char iface[INTERFACE_NAME_LEN];
+    struct in_addr addr;
+    long unsigned int destination, gateway;
+    memset(&addr, 0, sizeof(struct in_addr));
+    std::ifstream fin("/proc/net/route");
+    std::string line;
+
+    while (std::getline(fin, line)) {
+        if (sscanf(line.c_str(), "%s%lx%lx", iface, &destination, &gateway) == 3) {
+            if (destination == 0 && std::string(iface) == interface_name) {
+                fin.close();
+                addr.s_addr = gateway;
+                return std::string(inet_ntoa(addr));
+            }
+        }
+    }
+
+    fin.close();
+    return "";
+}
+
+void NetworkScanner::_listen() {
+    constexpr unsigned int BUF_SIZE = 512;
+    unsigned char buffer[BUF_SIZE];
+    while (Thread::listening_signal.load(std::memory_order_relaxed)) {
+        for (const Interface &interface : interfaces) {
+            ssize_t recv_len = recvfrom(interface.get_socket_fd(), buffer, BUF_SIZE, 0, NULL, NULL);
+            if (recv_len == -1) {
+                if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                    errno = 0;
+                    continue;
+                } else {
+                    std::cerr << "_listen: Failed to receive packet.\n";
+                    return;
+                }
+            }
+
+            Arp::arp_response response = Arp::parse_arp_response(buffer);
+            if (response.is_valid) {
+                Thread::listening_mtx.lock();
+                response_count[response.ip_address] = scan_count;
+                arp_table[response.ip_address] = response.mac_address;
+                Thread::listening_mtx.unlock();
+            }
+        }
+    }
+}
+
+std::vector<Host> NetworkScanner::scan_networks(const uint32_t waiting_time_ms) {
+    scan_count++;
+
+    for (const Interface &interface : interfaces) {
+        scan_subnet(interface);
+    }
+
+    // Wait some time for the arp response to arrive.
+    std::this_thread::sleep_for(std::chrono::milliseconds(waiting_time_ms));
 
     std::vector<Host> hosts;
-    for (auto &[ip_address, mac_address] : arp_table) {
-        hosts.emplace_back(ip_address, mac_address);
+    Thread::listening_mtx.lock();
+    auto iter = arp_table.begin();
+    while (iter != arp_table.end()) {
+        if (scan_count - response_count[iter->first] > idle_threshold) {
+            response_count.erase(iter->first);
+            iter = arp_table.erase(iter);
+        } else {
+            hosts.emplace_back(iter->first, iter->second);
+            iter = std::next(iter);
+        }
     }
+    Thread::listening_mtx.unlock();
 
     return hosts;
 }
@@ -123,4 +196,9 @@ Interface NetworkScanner::get_interface_by_ip(const std::string &ip) const {
         }
     }
     return Interface();
+}
+
+void NetworkScanner::listen() {
+    Thread::listening_signal.store(true);
+    Thread::listening_thread = std::thread(&NetworkScanner::_listen, this);
 }
