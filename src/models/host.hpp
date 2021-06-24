@@ -17,12 +17,22 @@ class Host {
     Host(const std::string &ip_address, const std::string &mac_address);
     bool operator<(const Host &other) const;
     bool operator==(const Host &other) const;
+
+    // Get the IP of the host.
     std::string get_ip() const;
+
+    // Get the MAC address of the host.
     std::string get_mac() const;
+
+    // Get the Internet connection status of the host.
+    // Either NORMAL, CUT, or NOT_EXIST.
     Status get_status() const;
+
+    // Check if the host is currently under attack.
     bool is_cut() const;
+
+    // Set the Internet connection status of the host.
     void set_status(Status status) const;
-    void set_mac_address(const std::string &mac_address) const;
 };
 
 #endif

@@ -22,7 +22,7 @@ namespace Socket {
     // Bind the socket to a specific interface.
     void bind_socket(const int sd, const std::string &interface_name);
 
-    // Get the interface index.
+    // Get the interface index kept by the OS.
     int get_interface_index(const int sd, const std::string &interface_name);
 
     // Close all sockets opened previously.

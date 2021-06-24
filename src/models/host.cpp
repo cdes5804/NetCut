@@ -39,7 +39,3 @@ bool Host::is_cut() const {
 void Host::set_status(Status status) const {
     this->status = status;
 }
-
-void Host::set_mac_address(const std::string &mac_address) const {
-    this->mac_address = mac_address;
-}
