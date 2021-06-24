@@ -17,9 +17,10 @@ A simple tool to ban people's Internet connection with ARP spoofing.
 2. `cd` into the directory and run `docker-compose run --rm netcut` (`--rm` is optional, it cleans up the container after the program exits). You can specify additional parameters for the application:
    * `--port`: the port of the APIs. Default: 9090
    * `--attack_interval`: Occasionally, the attacked target will issue ARP requests. The attack loses effect when the target receives the correct mac addresses. So we continously perform ARP spoofing (automatically), this flag specify the interval in milliseconds between continuous spoofing. Default: 10000
-   * `--scan_interval`: The application scans the network for newly joined targets. This flag specify the **minimum** time in milliseconds we wait before the next scanning. Default: 5000
+   * `--idle_threshold`: If a target was present before, but did not respond to ARP request for more than `idle_threshold` times, it is considered offline and is removed from the target list. Default: 3
+   * `--server_threads`: The number of threads the application will use. Default: 2
 
-   Example: `docker-compose run netcut --port 8888 --attack_interval 12000 --scan_interval 8000`
+   Example: `docker-compose run netcut --port 8888 --attack_interval 12000 --idle_threshold 5`
 
 ## APIs
 
