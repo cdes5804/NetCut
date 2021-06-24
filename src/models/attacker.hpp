@@ -12,7 +12,7 @@ class Attacker {
     const uint32_t BUF_SIZE = 512;
     const uint32_t attack_interval_ms;
     std::map<std::string, std::string> fake_mac_address;
-    void _attack(const Interface &interface, const Host &target, const Host &gateway);
+    void _attack(const Interface interface, const Host target, const Host gateway);
 
   public:
     Attacker(const uint32_t attack_interval_ms);

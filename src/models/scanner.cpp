@@ -113,9 +113,7 @@ void NetworkScanner::scan_interface() {
 }
 
 std::string NetworkScanner::find_gateway(const std::string &interface_name) {
-    constexpr uint16_t BUFFER_SIZE = 4096;
     constexpr uint8_t INTERFACE_NAME_LEN = 16;
-    char buf[BUFFER_SIZE];
     char iface[INTERFACE_NAME_LEN];
     struct in_addr addr;
     long unsigned int destination, gateway;
@@ -124,7 +122,7 @@ std::string NetworkScanner::find_gateway(const std::string &interface_name) {
     std::string line;
 
     while (std::getline(fin, line)) {
-        if (sscanf(buf, "%s%lx%lx", iface, &destination, &gateway) == 3) {
+        if (sscanf(line.c_str(), "%s%lx%lx", iface, &destination, &gateway) == 3) {
             if (destination == 0 && std::string(iface) == interface_name) {
                 fin.close();
                 addr.s_addr = gateway;
@@ -194,11 +192,9 @@ std::vector<Host> NetworkScanner::scan_networks(const uint32_t waiting_time_ms) 
 Interface NetworkScanner::get_interface_by_ip(const std::string &ip) const {
     for (const Interface &interface : interfaces) {
         if (interface.is_same_subnet(ip)) {
-            std::cerr << interface.get_socket_fd() << "\n";
             return interface;
         }
     }
-    std::cerr << "not found\n";
     return Interface();
 }
 

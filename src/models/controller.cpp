@@ -22,7 +22,7 @@ void Controller::scan_targets() {
 
     auto iter = hosts.begin();
     while (iter != hosts.end()) {
-        if (std::find(active_hosts.begin(), active_hosts.end(), Host(iter->get_ip())) == active_hosts.end()) {
+        if (!iter->is_cut() && std::find(active_hosts.begin(), active_hosts.end(), Host(iter->get_ip())) == active_hosts.end()) {
             iter = hosts.erase(iter);
         } else {
             iter = std::next(iter);
@@ -61,7 +61,6 @@ ACTION_STATUS Controller::action(const std::string &target_ip) {
 
 void Controller::attack(const Host &target) {
     Interface interface = scanner.get_interface_by_ip(target.get_ip());
-    std::cerr << "controller: " << interface.get_socket_fd() << "\n";
     Host gateway = get_host(interface.get_gateway_ip());
     attacker.attack(interface, target, gateway);
     target.set_status(Status::CUT);
