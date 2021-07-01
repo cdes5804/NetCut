@@ -55,7 +55,7 @@ jobs:
       -
         name: Start Docker Container
         run: |
-          docker run --rm --network host netcut --port ${{ env.PORT }}
+          docker run --rm -d --network host netcut --port ${{ env.PORT }}
       -
         name: Install node
         uses: actions/setup-node@v2
