@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM alpine:latest AS builder
 
 RUN apk update && apk upgrade && apk add alpine-sdk && apk add linux-headers && apk add cmake && apk add meson && rm -rf /var/cache/apk/*
 
@@ -13,5 +13,10 @@ WORKDIR /NetCut
 COPY . .
 RUN make
 
-ENTRYPOINT [ "/NetCut/bin/netcut" ]
+FROM alpine:latest
+RUN apk add --no-cache libstdc++
+COPY --from=builder /usr/local/lib /usr/local/lib
+COPY --from=builder /NetCut/bin/netcut /netcut
+
+ENTRYPOINT [ "/netcut" ]
 CMD [ "--port", "9090" ]
