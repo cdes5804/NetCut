@@ -66,6 +66,9 @@ jobs:
         run: |
           npm install -g newman
       -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
         name: Run POSTMAN collection
         run: |
           newman run ./test/newman_collection.json --env-var "port=${{ env.PORT }}"
