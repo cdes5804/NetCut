@@ -51,7 +51,6 @@ jobs:
         name: Load Docker image
         run: |
           docker load --input /tmp/netcut.tar
-          docker image ls -a
       -
         name: Start Docker Container
         run: |
@@ -69,6 +68,6 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
       -
-        name: Run POSTMAN collection
+        name: Run Postman collection
         run: |
           newman run ./test/newman_collection.json --env-var "port=${{ env.PORT }}"
