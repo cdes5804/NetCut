@@ -1,6 +1,6 @@
 # NetCut :scissors:
 
-![Build status](https://github.com/cdes5804/NetCut/actions/workflows/c-cpp.yml/badge.svg)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/cdes5804/NetCut/CI?style=for-the-badge)
 ## Introduction
 
 A simple tool to ban people's Internet connection with ARP spoofing.
