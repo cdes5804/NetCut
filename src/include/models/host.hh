@@ -1,26 +1,24 @@
-#ifndef _HOST_HPP
-#define _HOST_HPP
+#ifndef HOST_HH
+#define HOST_HH
 
 #include <string>
-
-using std::string;
 
 enum class Status { NORMAL, CUT };
 
 class Host {
  private:
-  string ip_address;
-  mutable string mac_address;
-  mutable Status status;
+  std::string ip_address_;
+  mutable std::string mac_address_;
+  mutable Status status_;
 
  public:
-  Host(const string &ip_address, const string &mac_address);
+  Host(const std::string &ip_address, const std::string &mac_address);
   bool operator<(const Host &other) const;
-  string get_ip() const;
-  string get_mac() const;
-  bool is_cut() const;
-  void set_status(Status status) const;
-  void set_mac_address(const string &mac_address) const;
+  std::string GetIp() const;
+  std::string GetMac() const;
+  bool IsCut() const;
+  void SetStatus(Status status) const;
+  void SetMacAddress(const std::string &mac_address) const;
 };
 
 #endif

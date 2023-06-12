@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: CI
 
 on:
   push:
@@ -8,10 +8,35 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+    container: ubuntu:20.04
     steps:
-    - uses: actions/checkout@v2
-    - name: make
-      run: make
+      - name: Install Dependencies
+        run: |
+          apt update
+          DEBIAN_FRONTEND=noninteractive apt install -y build-essential \
+                                          clang \
+                                          clang-format \
+                                          clang-tidy \
+                                          cmake \
+                                          git \
+                                          g++ \
+                                          python
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Format
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          make format
+      - name: Build
+        run: |
+          cd build
+          make
+      - name: Check Coding Style
+        run: |
+          cd build
+          make check-coding-style
+          

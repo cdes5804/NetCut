@@ -5,11 +5,11 @@ int main(int argc, char *argv[]) {
   Controller controller(attack_interval_ms);
 
   while (true) {
-    controller.show_targets();
-    std::vector<size_t> indices = controller.get_targets();
+    controller.ShowTargets();
+    std::vector<size_t> indices = controller.GetTargets();
 
     for (size_t index : indices) {
-      controller.action(index);
+      controller.Action(index);
     }
   }
 

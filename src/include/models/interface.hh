@@ -1,21 +1,21 @@
-#ifndef _INTERFACE_HPP
-#define _INTERFACE_HPP
+#ifndef INTERFACE_HH
+#define INTERFACE_HH
 
 #include <string>
 
 class Interface {
  private:
-  std::string name;
-  std::string ip;
-  std::string netmask;
+  std::string name_;
+  std::string ip_;
+  std::string netmask_;
 
  public:
-  Interface(const std::string &name, const std::string &ip, const std::string &netmask);
+  Interface(std::string name, std::string ip_address, std::string netmask);
   Interface();
-  std::string get_name() const;
-  std::string get_ip() const;
-  std::string get_netmask() const;
-  bool is_same_subnet(const std::string &ip) const;
+  std::string GetName() const;
+  std::string GetIp() const;
+  std::string GetNetMask() const;
+  bool IsSameSubnet(const std::string &ip_address) const;
 };
 
 #endif

@@ -1,14 +1,14 @@
-#ifndef _MAC_HPP
-#define _MAC_HPP
+#ifndef MAC_HH
+#define MAC_HH
 
 #include <string>
 
-namespace Mac {
+namespace mac_utils {
 constexpr int MAC_LENGTH = 6;
-void string_mac_to_byte(unsigned char *buffer, const std::string &mac_address);
-std::string byte_mac_to_string(unsigned char *buffer);
-std::string get_interface_mac_address(int sd, const std::string &interface_name);
-std::string get_random_mac_address();
-}  // namespace Mac
+void StringToByte(unsigned char *buffer, const std::string &mac_address);
+std::string ByteToString(unsigned char *buffer);
+std::string GetInterfaceMacAddress(int socket_fd, const std::string &interface_name);
+std::string GetRandomMacAddress();
+}  // namespace mac_utils
 
 #endif

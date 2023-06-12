@@ -1,9 +1,9 @@
-#ifndef _COLOR_HPP
-#define _COLOR_HPP
+#ifndef COLOR_HH
+#define COLOR_HH
 
 #include <iostream>
 
-namespace Color {
+namespace color {
 enum class Code {
   FG_RED = 31,
   FG_GREEN = 32,
@@ -17,14 +17,14 @@ enum class Code {
 
 class Modifier {
  private:
-  Code code;
+  Code code_;
 
  public:
-  Modifier(Code pCode) : code(pCode) {}
-  friend std::ostream &operator<<(std::ostream &os, const Modifier &mod) {
-    return os << "\033[" << static_cast<int32_t>(mod.code) << "m";
+  explicit Modifier(Code pCode) : code_(pCode) {}
+  friend std::ostream &operator<<(std::ostream &out_stream, const Modifier &mod) {
+    return out_stream << "\033[" << static_cast<int32_t>(mod.code_) << "m";
   }
 };
-}  // namespace Color
+}  // namespace color
 
 #endif

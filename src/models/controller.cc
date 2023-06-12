@@ -9,21 +9,21 @@
 #include <iostream>
 #include <string>
 
-Controller::Controller(const int attack_interval_ms) : attack_interval_ms(attack_interval_ms) {}
+Controller::Controller(const int attack_interval_ms) : attack_interval_ms_(attack_interval_ms) {}
 
-void Controller::scan_targets() {
-  std::vector<Host> active_hosts = scanner.scan_networks();
+void Controller::ScanTargets() {
+  std::vector<Host> active_hosts = scanner_.ScanNetworks();
   for (const Host &active_host : active_hosts) {
-    hosts.insert(active_host);
+    hosts_.insert(active_host);
   }
 }
 
-void Controller::show_targets() {
-  scan_targets();
+void Controller::ShowTargets() {
+  ScanTargets();
 
-  Color::Modifier red(Color::Code::FG_RED);
-  Color::Modifier green(Color::Code::FG_GREEN);
-  Color::Modifier normal(Color::Code::FG_DEFAULT);
+  color::Modifier red(color::Code::FG_RED);
+  color::Modifier green(color::Code::FG_GREEN);
+  color::Modifier normal(color::Code::FG_DEFAULT);
 
   std::cout << "\n========================= Net Cut =========================\n";
   std::cout << "Select one or more targets by number, separated by space.\n";
@@ -32,35 +32,34 @@ void Controller::show_targets() {
   std::cout << red << "red: already cut targets, select to recover.\n" << normal << "\n";
 
   size_t counter = 1;
-  for (const Host &host : hosts) {
-    std::cout << (host.is_cut() ? red : green) << (counter++) << ") " << host.get_ip() << " (" << host.get_mac()
-              << ")\n"
+  for (const Host &host : hosts_) {
+    std::cout << (host.IsCut() ? red : green) << (counter++) << ") " << host.GetIp() << " (" << host.GetMac() << ")\n"
               << normal;
   }
 
   std::cout << "\nTargets: ";
 }
 
-std::vector<size_t> Controller::get_targets() {
+std::vector<size_t> Controller::GetTargets() {
   std::vector<size_t> indices;
   std::string input;
   std::getline(std::cin, input);
-  std::string trimmed_input = String::trim(input);
+  std::string trimmed_input = string_utils::Trim(input);
 
   if (trimmed_input == "q") {
-    recover_all_hosts();  // being nice by recovering the network for targets before exiting
-    Socket::close_sockets();
-    Thread::stop_all_threads();
+    RecoverAllHosts();  // being nice by recovering the network for targets before exiting
+    socket_utils::CloseSockets();
+    thread_utils::StopAllThreads();
     exit(EXIT_SUCCESS);
   } else if (trimmed_input == "r") {
-    return std::vector<size_t>();
+    return std::vector<size_t>{};
   }
 
-  std::vector<std::string> tokens = String::split(trimmed_input, " ");
+  std::vector<std::string> tokens = string_utils::Split(trimmed_input, " ");
 
-  std::for_each(tokens.begin(), tokens.end(), [&](const string &s) {
-    if (!s.empty() && std::all_of(s.begin(), s.end(), [](const char &chr) { return isdigit(chr); })) {
-      indices.emplace_back(std::stoul(s));
+  std::for_each(tokens.begin(), tokens.end(), [&](const std::string &str) {
+    if (!str.empty() && std::all_of(str.begin(), str.end(), [](const char &chr) { return isdigit(chr); })) {
+      indices.emplace_back(std::stoul(str));
     }
   });
 
@@ -69,59 +68,59 @@ std::vector<size_t> Controller::get_targets() {
   return indices;
 }
 
-void Controller::action(size_t index) {
+void Controller::Action(size_t index) {
   index--;
-  if (index >= hosts.size()) {
+  if (index >= hosts_.size()) {
     return;
   }
 
-  auto iter = hosts.begin();
+  auto iter = hosts_.begin();
   std::advance(iter, index);
 
-  if (iter->is_cut()) {
-    recover(*iter);
+  if (iter->IsCut()) {
+    Recover(*iter);
   } else {
-    attack(*iter);
+    Attack(*iter);
   }
 }
 
-void Controller::attack(const Host &target) {
-  Interface interface = scanner.get_interface_by_ip(target.get_ip());
-  for (const Host &host : hosts) {
-    if (host.get_ip() == target.get_ip() || !interface.is_same_subnet(host.get_ip())) {
+void Controller::Attack(const Host &target) {
+  Interface interface = scanner_.GetInterfaceByIp(target.GetIp());
+  for (const Host &host : hosts_) {
+    if (host.GetIp() == target.GetIp() || !interface.IsSameSubnet(host.GetIp())) {
       continue;
     }
 
-    if (arp.find(target) == arp.end()) {
-      arp[target] = ARP(interface);
+    if (arp_.find(target) == arp_.end()) {
+      arp_[target] = ARP(interface);
     }
 
-    if (fake_mac_address.find(host) == fake_mac_address.end()) {
-      fake_mac_address[host] = get_fake_mac_address();
+    if (fake_mac_address_.find(host) == fake_mac_address_.end()) {
+      fake_mac_address_[host] = GetFakeMacAddress();
     }
 
-    arp[target].spoof(target, host, attack_interval_ms, fake_mac_address[host]);
+    arp_[target].Spoof(target, host, attack_interval_ms_, fake_mac_address_[host]);
   }
-  target.set_status(Status::CUT);
+  target.SetStatus(Status::CUT);
 }
 
-void Controller::recover(const Host &target) {
-  Interface interface = scanner.get_interface_by_ip(target.get_ip());
-  for (const Host &host : hosts) {
-    if (host.get_ip() == target.get_ip() || !interface.is_same_subnet(host.get_ip())) {
+void Controller::Recover(const Host &target) {
+  Interface interface = scanner_.GetInterfaceByIp(target.GetIp());
+  for (const Host &host : hosts_) {
+    if (host.GetIp() == target.GetIp() || !interface.IsSameSubnet(host.GetIp())) {
       continue;
     }
-    arp[target].recover(target, host);
+    arp_[target].Recover(target, host);
   }
-  target.set_status(Status::NORMAL);
+  target.SetStatus(Status::NORMAL);
 }
 
-void Controller::recover_all_hosts() {
-  for (const Host &host : hosts) {
-    if (host.is_cut()) {
-      recover(host);
+void Controller::RecoverAllHosts() {
+  for (const Host &host : hosts_) {
+    if (host.IsCut()) {
+      Recover(host);
     }
   }
 }
 
-std::string Controller::get_fake_mac_address() const { return Mac::get_random_mac_address(); }
+std::string Controller::GetFakeMacAddress() const { return mac_utils::GetRandomMacAddress(); }

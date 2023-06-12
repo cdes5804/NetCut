@@ -2,28 +2,30 @@
 
 #include <algorithm>
 
-std::string &String::ltrim(std::string &s) {
-  s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+std::string &string_utils::LTrim(std::string &str) {
+  str.erase(str.begin(),
+            std::find_if(str.begin(), str.end(), [](unsigned char chr) { return std::isspace(chr) == 0; }));
 
-  return s;
+  return str;
 }
 
-std::string &String::rtrim(std::string &s) {
-  s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), s.end());
+std::string &string_utils::RTrim(std::string &str) {
+  str.erase(std::find_if(str.rbegin(), str.rend(), [](unsigned char chr) { return std::isspace(chr) == 0; }).base(),
+            str.end());
 
-  return s;
+  return str;
 }
 
-std::string &String::trim(std::string &s) { return ltrim(rtrim(s)); }
+std::string &string_utils::Trim(std::string &str) { return LTrim(RTrim(str)); }
 
-std::vector<std::string> String::split(std::string s, const std::string &delimiter) {
+std::vector<std::string> string_utils::Split(std::string str, const std::string &delimiter) {
   size_t pos = 0;
   std::vector<std::string> tokens;
-  while ((pos = s.find(delimiter)) != std::string::npos) {
-    tokens.emplace_back(s.substr(0, pos));
-    s.erase(0, pos + delimiter.length());
+  while ((pos = str.find(delimiter)) != std::string::npos) {
+    tokens.emplace_back(str.substr(0, pos));
+    str.erase(0, pos + delimiter.length());
   }
 
-  tokens.emplace_back(s);
+  tokens.emplace_back(str);
   return tokens;
 }

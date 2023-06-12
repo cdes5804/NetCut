@@ -1,5 +1,5 @@
-#ifndef _SCANNER_HPP
-#define _SCANNER_HPP
+#ifndef SCANNER_HH
+#define SCANNER_HH
 
 #include "models/host.hh"
 #include "models/interface.hh"
@@ -12,18 +12,18 @@
 
 class NetworkScanner {
  private:
-  std::map<std::string, std::string> arp_table;
-  std::vector<Interface> interfaces;
-  bool is_network(const struct ifaddrs *ifaddr) const;
-  bool is_link(const struct ifaddrs *ifaddr) const;
-  std::string get_ip(const struct ifaddrs *ifaddr) const;
-  std::string get_netmask(const struct ifaddrs *ifaddr) const;
-  std::string get_interface_name(const struct ifaddrs *ifaddr) const;
-  void scan_subnet(const Interface &interface);
+  std::map<std::string, std::string> arp_table_;
+  std::vector<Interface> interfaces_;
+  bool IsNetwork(const struct ifaddrs *ifaddr) const;
+  bool IsLink(const struct ifaddrs *ifaddr) const;
+  std::string GetIp(const struct ifaddrs *ifaddr) const;
+  std::string GetNetMask(const struct ifaddrs *ifaddr) const;
+  std::string GetInterfaceName(const struct ifaddrs *ifaddr) const;
+  void ScanSubnet(const Interface &interface);
 
  public:
-  std::vector<Host> scan_networks();
-  Interface get_interface_by_ip(const std::string &ip) const;
+  std::vector<Host> ScanNetworks();
+  Interface GetInterfaceByIp(const std::string &ip_address) const;
 };
 
 #endif

@@ -48,7 +48,7 @@ include_directories(${SRC_INCLUDE_DIR})
 add_subdirectory(src)
 
 add_executable(${PROJECT_NAME} src/main.cc)
-target_link_libraries(${PROJECT_NAME} netcut_shared)
+target_link_libraries(${PROJECT_NAME} netcut_shared bsd)
 
 ##########################################
 # "make format"

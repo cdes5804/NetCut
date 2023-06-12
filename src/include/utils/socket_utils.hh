@@ -1,15 +1,15 @@
-#ifndef _SOCKET_HPP
-#define _SOCKET_HPP
+#ifndef SOCKET_HH
+#define SOCKET_HH
 
 #include <map>
 #include <string>
 
-namespace Socket {
+namespace socket_utils {
 extern std::map<std::string, int> sockets;
-int open_socket(const std::string &ip);                       // opens a socket associated with the ip
-void bind_socket(int sd, const std::string &interface_name);  // binds socket to the provided interface
-int get_interface_index(int sd, const std::string &interface_name);
-void close_sockets();
-}  // namespace Socket
+int OpenSocket(const std::string &ip_address);                              // opens a socket associated with the ip
+void BindSocket(int socket_fd, const std::string &interface_name);  // binds socket to the provided interface
+int GetInterfaceIndex(int socket_fd, const std::string &interface_name);
+void CloseSockets();
+}  // namespace socket_utils
 
 #endif
