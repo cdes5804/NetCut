@@ -21,7 +21,8 @@ jobs:
                                           cmake \
                                           git \
                                           g++ \
-                                          python
+                                          python \
+                                          libbsd-dev
       - uses: actions/checkout@v2
         with:
           submodules: recursive
