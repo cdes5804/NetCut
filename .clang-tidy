@@ -30,6 +30,7 @@ Checks:     '
             -bugprone-easily-swappable-parameters,
             -clang-analyzer-cplusplus.NewDelete,
             -clang-analyzer-cplusplus.NewDeleteLeaks,
+            -google-runtime-references,
             -modernize-use-nodiscard,
             -modernize-avoid-c-arrays,
             -readability-magic-numbers,
