@@ -6,6 +6,7 @@
 
 #include <string>
 #include <map>
+#include <cstdint>
 
 constexpr int PROTO_ARP = 0x0806;
 constexpr int ETH2_HEADER_LEN = 14;
