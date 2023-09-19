@@ -11,6 +11,10 @@
 #include <arpa/inet.h>
 
 bool NetworkScanner::is_network(const struct ifaddrs *ifaddr) const {
+    if (ifaddr->ifa_addr == NULL) {
+        return false;
+    }
+
     sa_family_t family = ifaddr->ifa_addr->sa_family;
     unsigned int flags = ifaddr->ifa_flags;
     bool is_up = (flags & IFF_UP) != 0;
